@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlmodel
+psycopg2-binary
+alembic
+pwdlib[argon2]
+pyjwt
+python-multipart
+email-validator
+dotenv
+finnhub-python
+ollama 
+redis[hiredis]
+jinja2
+yfinance
+pandas

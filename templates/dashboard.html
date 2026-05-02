@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$tackz Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f0f0f;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .ticker { font-size: 22px; font-weight: bold; }
+        .verdict {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .verdict-buy { background: #00c853; color: black; }
+        .verdict-hold { background: #ffd600; color: black; }
+        .verdict-sell { background: #ff1744; color: white; }
+        .signal-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .signal {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+        }
+        .confidence {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .summary {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .factors { list-style: none; padding: 0; margin: 0; }
+        .factors li {
+            font-size: 12px;
+            color: #aaa;
+            padding: 2px 0;
+        }
+        .factors li::before { content: "→ "; color: #555; }
+        .no-data { text-align: center; color: #666; margin-top: 80px; }
+        a.logout {
+            color: #ff5252;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #444;
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>$tackz 📈</h1>
+        <div>
+            <span style="color:#888; margin-right: 16px;">{{ username }}</span>
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </header>
+
+    {% if tickers %}
+        <div class="grid">
+            {% for ticker, data in tickers.items() %}
+            <div class="card">
+                <div class="card-header">
+                    <span class="ticker">{{ ticker }}</span>
+                    <span class="verdict verdict-{{ data.verdict }}">{{ data.verdict | upper }}</span>
+                </div>
+                <div class="signal-row">
+                    <span class="signal">📊 Analyst: {{ data.analyst_signal }}</span>
+                    <span class="signal">🏦 Insider: {{ data.insider_signal }}</span>
+                </div>
+                <div class="confidence">Confidence: {{ (data.confidence * 100) | int }}%</div>
+                <div class="summary">{{ data.summary }}</div>
+                <ul class="factors">
+                    {% for factor in data.key_factors %}
+                        <li>{{ factor }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-data">
+            <p>No ticker data available yet.</p>
+            <p style="color:#555; font-size:13px;">The cron job may not have run yet. Check back soon.</p>
+        </div>
+    {% endif %}
+
+    <p class="disclaimer">big bucks time</p>
+</body>
+</html>

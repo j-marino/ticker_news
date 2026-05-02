@@ -1,0 +1,33 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# environment
+.env
+*.env
+
+# git
+.git/
+.gitignore
+
+# logs
+*.log
+logs/
+
+# testing
+tests/
+pytest.ini
+.pytest_cache/
+
+# editor
+.vscode/
+.idea/
+
+# docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
