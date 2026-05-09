@@ -199,7 +199,25 @@ def generate_all_verdicts(ticker_data):
             print(f"Failed for {ticker}: {e}")
     return verdicts
 
+import yfinance as yf
 
+def get_company_description(ticker):
+    try:
+        info = yf.Ticker(ticker).info
+        return info.get("longBusinessSummary")
+    except:
+        return None
+
+def get_company_profiles(finnhub_client, ticker_list):
+    profiles = {}
+    for ticker in ticker_list:
+        try:
+            profile = finnhub_client.company_profile2(symbol=ticker)
+            if profile:
+                profiles[ticker] = profile
+        except Exception as e:
+            print(f"Profile failed for {ticker}: {e}")
+    return profiles
 
 conn = http.client.HTTPSConnection('api.marketaux.com')
 params = urllib.parse.urlencode({
