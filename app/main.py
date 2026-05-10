@@ -62,7 +62,7 @@ class UserPublic(BaseModel):
     email: EmailStr
 
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_HOST = os.getenv("DB_HOST", "DATABASE_URL") 
 postgres_url = f"postgresql://postgres:myPassword@{DB_HOST}:5432/tickers"
 engine = create_engine(postgres_url) 
 
