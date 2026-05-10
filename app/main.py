@@ -96,12 +96,16 @@ conf = ConnectionConfig(
 )
 
 templates = Jinja2Templates(directory="/home/jman/newsletter/templates")
-# app.mount("/static", StaticFiles(directory="/home/jman/newsletter/static"), name="static") for when i decide to use a real css stylesheet (never xD)
+app.mount("/static", StaticFiles(directory="/home/jman/newsletter/static"), name="static") 
 
-
-@app.get("/", response_class=HTMLResponse)
+@app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
     return templates.TemplateResponse(request=request, name="login.html", context={"error": None})
+
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse(request=request, name="register.html", context={"error": None})
 
 
 @app.get("/dashboard", response_class=HTMLResponse)

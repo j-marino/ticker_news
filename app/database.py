@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import os
 import json
 from sqlmodel import Field, SQLModel, create_engine, Session, select
-from sqlalchemy import Column, text
+from sqlalchemy import Column, text, delete
 from sqlalchemy.dialects.postgresql import JSONB
 from dotenv import load_dotenv
 
@@ -69,6 +69,12 @@ def get_all_verdicts():
             "logo_url": row.logo_url,
             "updated_at": row.updated_at.isoformat()
         } for row in rows}
+    
+def delete_all_veridcts():
+    with Session(engine) as session:
+        session.exec(delete(Verdict))
+        session.commit()
+        print("deleted verdict table contents")
 
 if __name__ == "__main__":
     create_db_and_tables()
