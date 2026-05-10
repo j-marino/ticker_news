@@ -20,9 +20,10 @@ class Verdict(SQLModel, table=True):
         default_factory=lambda: datetime.now(timezone.utc)
     )
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-postgres_url = f"postgresql://postgres:myPassword@{DB_HOST}:5432/tickers"
-engine = create_engine(postgres_url)
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
+
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
