@@ -63,8 +63,6 @@ class UserPublic(BaseModel):
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-print("DEBUGGING: DATABASE_URL =", DATABASE_URL)
-
 engine = create_engine(DATABASE_URL)
 
 password_hash = PasswordHash.recommended()
@@ -108,6 +106,11 @@ conf = ConnectionConfig(
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static") 
+
+#redirect root to login
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/login")
 
 @app.get("/login", response_class=HTMLResponse)
 @limiter.limit("5/minute")
@@ -162,7 +165,7 @@ async def login(request: Request, session: SessionDep, form_data: Annotated[OAut
     )
     
     response = RedirectResponse(url="/dashboard", status_code=302)
-    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    response.set_cookie(key="access_token", value=access_token, secure=True, httponly=True)
     return response
 
 @app.get("/logout")
@@ -185,7 +188,7 @@ def validate_password(password: str) -> bool:
 
 def validate_username(username: str) -> bool:
     valid_characters = f"{string.ascii_letters}_0123456789" 
-    invalid_name = None
+    invalid_name = False
     for letter in username:
         if letter not in valid_characters:
             invalid_name = True
@@ -286,6 +289,7 @@ async def get_current_active_user(
 
     
 @app.post("/token")
+@limiter.limit("5/minute")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: SessionDep
@@ -367,6 +371,7 @@ async def create_user(
 
 
 @app.get("/verify", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def verify_page(request: Request):
     # if no pending registration, redirect home
     if not request.cookies.get("pending_username"):
@@ -379,6 +384,7 @@ async def verify_page(request: Request):
 
 
 @app.post("/verify")
+@limiter.limit("10/minute") # more generous rate limiting on inputting code
 async def email_verify(
     request: Request,
     session: SessionDep,
