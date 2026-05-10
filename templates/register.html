@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$tackz — Register</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="auth-page">
+    <div class="auth-logo">$tackz</div>
+    <div class="auth-tagline">Tired of FOMO'ing on missed opportunities?</div>
+
+    <div class="auth-forms">
+        <div class="auth-box">
+            <h2>Register</h2>
+            {% if error %}
+                <div class="auth-error">{{ error }}</div>
+            {% endif %}
+            <form action="/register" method="post">
+                <input type="text" name="username" placeholder="username" autocomplete="username" required>
+                <input type="email" name="email" placeholder="email" autocomplete="email" required>
+                <input type="password" name="password" placeholder="password" autocomplete="new-password" required>
+                <button type="submit" class="auth-btn">REGISTER</button>
+            </form>
+            <p>already a member? <a href="/login">login here</a></p>
+        </div>
+    </div>
+
+    <p class="auth-disclaimer">⚠ not financial advice &nbsp;|&nbsp; for informational purposes only</p>
+</div>
+
+</body>
+</html>

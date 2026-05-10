@@ -14,3 +14,4 @@ redis[hiredis]
 jinja2
 yfinance
 pandas
+fastapi_mail

@@ -2,66 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Verify Email</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #0f0f0f;
-            color: white;
-        }
-        .container {
-            background: #1a1a1a;
-            padding: 32px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            width: 300px;
-            text-align: center;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: white;
-            box-sizing: border-box;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-align: center;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #00c853;
-            color: black;
-            font-weight: bold;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .error { color: #ff5252; margin-bottom: 10px; font-size: 14px; }
-        p { color: #888; font-size: 13px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$tackz — Verify Email</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
+
+<div class="verify-page">
+    <div class="verify-box">
+        <div class="auth-logo" style="font-size:20px; margin-bottom:16px;">$tackz</div>
         <h2>Check your email</h2>
-        <p>Enter the 6-digit code we sent you.</p>
+        <p>Enter the 6-digit code we sent you. It expires in 10 minutes.</p>
+
         {% if error %}
-            <div class="error">{{ error }}</div>
+            <div class="auth-error">{{ error }}</div>
         {% endif %}
+
         <form action="/verify" method="post">
-            <input type="number" name="inputted_code" placeholder="000000" maxlength="6" required>
-            <button type="submit">Verify</button>
+            <input type="number" name="inputted_code" placeholder="000000" min="100000" max="999999" required>
+            <button type="submit" class="auth-btn">VERIFY</button>
         </form>
     </div>
+</div>
+
 </body>
 </html>

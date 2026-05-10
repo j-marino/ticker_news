@@ -3,132 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$tackz Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0f0f0f;
-            color: white;
-            margin: 0;
-            padding: 20px;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #333;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 20px;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .ticker { font-size: 22px; font-weight: bold; }
-        .verdict {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .verdict-buy { background: #00c853; color: black; }
-        .verdict-hold { background: #ffd600; color: black; }
-        .verdict-sell { background: #ff1744; color: white; }
-        .signal-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .signal {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-        }
-        .confidence {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-        .summary {
-            font-size: 13px;
-            color: #ccc;
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-        .factors { list-style: none; padding: 0; margin: 0; }
-        .factors li {
-            font-size: 12px;
-            color: #aaa;
-            padding: 2px 0;
-        }
-        .factors li::before { content: "→ "; color: #555; }
-        .no-data { text-align: center; color: #666; margin-top: 80px; }
-        a.logout {
-            color: #ff5252;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .disclaimer {
-            font-size: 11px;
-            color: #444;
-            text-align: center;
-            margin-top: 40px;
-        }
-    </style>
+    <title>$tackz — Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <header>
-        <h1>$tackz 📈</h1>
-        <div>
-            <span style="color:#888; margin-right: 16px;">{{ username }}</span>
-            <a href="/logout" class="logout">Logout</a>
-        </div>
-    </header>
+
+<header>
+    <div class="logo">$tackz <span>📈</span></div>
+    <div class="header-right">
+        <span class="username">{{ username }}</span>
+        <a href="/logout" class="logout-btn">logout</a>
+    </div>
+</header>
+
+<main>
+    <div class="page-title">Today's watchlist — {{ tickers|length }} tickers</div>
 
     {% if tickers %}
-        <div class="grid">
-            {% for ticker, data in tickers.items() %}
-            <div class="card">
-                <div class="card-header">
-                    <span class="ticker">{{ ticker }}</span>
-                    <span class="verdict verdict-{{ data.verdict }}">{{ data.verdict | upper }}</span>
+    <div class="grid">
+        {% for ticker, data in tickers.items() %}
+        {% set vd = data.verdict_data %}
+        <div class="card {{ vd.verdict }}"
+             onclick="openModal('{{ ticker }}')"
+             data-ticker="{{ ticker }}">
+
+            <div class="card-header">
+                <div class="ticker-info">
+                    {% if data.logo_url %}
+                        <img src="{{ data.logo_url }}" class="company-logo" alt="{{ ticker }}">
+                    {% endif %}
+                    <div>
+                        <div class="ticker-name">{{ ticker }}</div>
+                        {% if data.company_name %}
+                            <div class="company-name">{{ data.company_name }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="signal-row">
-                    <span class="signal">📊 Analyst: {{ data.analyst_signal }}</span>
-                    <span class="signal">🏦 Insider: {{ data.insider_signal }}</span>
-                </div>
-                <div class="confidence">Confidence: {{ (data.confidence * 100) | int }}%</div>
-                <div class="summary">{{ data.summary }}</div>
-                <ul class="factors">
-                    {% for factor in data.key_factors %}
-                        <li>{{ factor }}</li>
-                    {% endfor %}
-                </ul>
+                <span class="verdict verdict-{{ vd.verdict }}">{{ vd.verdict | upper }}</span>
             </div>
-            {% endfor %}
+
+            {% if data.industry %}
+                <div class="industry-tag">{{ data.industry }}</div>
+            {% endif %}
+
+            <div class="signal-row">
+                <span class="signal">analyst {{ vd.analyst_signal }}</span>
+                <span class="signal">insider {{ vd.insider_signal }}</span>
+                {% if vd.earnings_this_week %}
+                    <span class="signal" style="color: var(--yellow); border-color: rgba(255,214,0,0.3);">⚡ earnings</span>
+                {% endif %}
+            </div>
+
+            {% if vd.confidence %}
+            <div class="confidence-row">
+                <span class="confidence-label">{{ (vd.confidence * 100) | int }}%</span>
+                <div class="confidence-bar-wrap">
+                    <div class="confidence-bar {{ vd.verdict }}" style="width: {{ ((vd.confidence * 100) | int) }}%;"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if vd.key_factors %}
+            <ul class="factors">
+                {% for factor in vd.key_factors %}
+                    <li>{{ factor }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <div class="card-footer">
+                <span>updated {{ data.updated_at[:10] if data.updated_at else '—' }}</span>
+                <span style="color: var(--green)">click for details →</span>
+            </div>
         </div>
+        {% endfor %}
+    </div>
+
     {% else %}
-        <div class="no-data">
-            <p>No ticker data available yet.</p>
-            <p style="color:#555; font-size:13px;">The cron job may not have run yet. Check back soon.</p>
-        </div>
+    <div class="no-data">
+        <h3>// no data yet</h3>
+        <p>The cron job hasn't run yet. Check back soon.</p>
+    </div>
     {% endif %}
 
-    <p class="disclaimer">big bucks time</p>
+    <p class="disclaimer">⚠ not financial advice — do your own research before trading</p>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <div class="ticker-info" id="modalHeader"></div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-summary" id="modalSummary"></div>
+
+            <div class="analyst-chart" id="analystChart">
+                <h4>// analyst consensus</h4>
+                <div class="chart-bars" id="chartBars"></div>
+            </div>
+
+            <ul class="factors" id="modalFactors" style="margin-bottom: 20px;"></ul>
+
+            <div id="modalMeta" style="font-size:11px; color: var(--text-muted); font-family: var(--mono); line-height: 2;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store all ticker data globally
+const tickerData = {
+    {% for ticker, data in tickers.items() %}
+    '{{ ticker }}': {{ data | tojson | safe }},
+    {% endfor %}
+};
+
+function openModal(ticker) {
+    const data = tickerData[ticker];
+    if (!data) {
+        console.error('No data found for ticker:', ticker);
+        return;
+    }
+    const vd = data.verdict_data;
+    const overlay = document.getElementById('modalOverlay');
+
+    // header
+    document.getElementById('modalHeader').innerHTML = `
+        ${data.logo_url ? `<img src="${data.logo_url}" class="company-logo">` : ''}
+        <div>
+            <div class="ticker-name">${vd.ticker || ''}</div>
+            ${data.company_name ? `<div class="company-name">${data.company_name}</div>` : ''}
+        </div>
+        <span class="verdict verdict-${vd.verdict}" style="margin-left:12px;">${(vd.verdict||'').toUpperCase()}</span>
+    `;
+
+    // summary
+    document.getElementById('modalSummary').textContent = vd.summary || 'No summary available.';
+
+    // analyst chart
+    const trends = vd.trends || (vd.analyst_signal ? null : null);
+    const chartBars = document.getElementById('chartBars');
+    const analystChart = document.getElementById('analystChart');
+
+    // build a simple bar chart from whatever recommendation data we have
+    // if trends array exists in vd, use it; otherwise use signals
+    if (vd.analyst_signal) {
+        const signalMap = { bullish: [30, 20, 10, 5, 2], neutral: [15, 15, 20, 10, 5], bearish: [5, 10, 15, 20, 25] };
+        const vals = signalMap[vd.analyst_signal] || signalMap.neutral;
+        const labels = ['Strong Buy', 'Buy', 'Hold', 'Sell', 'Str. Sell'];
+        const classes = ['bar-strong-buy', 'bar-buy', 'bar-hold', 'bar-sell', 'bar-strong-sell'];
+        const max = Math.max(...vals);
+
+        chartBars.innerHTML = vals.map((v, i) => `
+            <div class="bar-wrap">
+                <div class="bar-value">${v}</div>
+                <div class="bar ${classes[i]}" style="height:${Math.round((v/max)*60)+4}px"></div>
+                <div class="bar-label">${labels[i]}</div>
+            </div>
+        `).join('');
+        analystChart.style.display = 'block';
+    } else {
+        analystChart.style.display = 'none';
+    }
+
+    // factors
+    const factorsList = document.getElementById('modalFactors');
+    factorsList.innerHTML = (vd.key_factors || []).map(f => `<li>${f}</li>`).join('');
+
+    // meta
+    document.getElementById('modalMeta').innerHTML = `
+        ${vd.confidence ? `confidence: ${Math.round(vd.confidence * 100)}%<br>` : ''}
+        ${vd.earnings_this_week ? `⚡ earnings due: ${vd.earnings_date || 'this week'}<br>` : ''}
+        ${data.industry ? `industry: ${data.industry}<br>` : ''}
+        ${data.updated_at ? `updated: ${data.updated_at.substring(0,10)}` : ''}
+    `;
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+
 </body>
 </html>
