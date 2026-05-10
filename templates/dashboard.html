@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$tackz — Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/retro-theme.css">
 </head>
 <body>
 
@@ -12,13 +13,19 @@
     <div class="logo">$tackz <span>📈</span></div>
     <div class="header-right">
         <span class="username">{{ username }}</span>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">◈ retro</button>
         <a href="/logout" class="logout-btn">logout</a>
     </div>
 </header>
 
 <main>
     <div class="page-title">Today's watchlist — {{ tickers|length }} tickers</div>
-
+        <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
+            <span style="font-family:var(--mono); font-size:10px; color:var(--text-muted); letter-spacing:1px;">SORT BY</span>
+            <button class="sort-btn active" onclick="sortCards('confidence')" id="sort-confidence">confidence</button>
+            <button class="sort-btn" onclick="sortCards('verdict')" id="sort-verdict">decision</button>
+            <button class="sort-btn" onclick="sortCards('ticker')" id="sort-ticker">ticker A-Z</button>
+        </div>
     {% if tickers %}
     <div class="grid">
         {% for ticker, data in tickers.items() %}
@@ -193,6 +200,55 @@ function closeModalOutside(e) {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+(function() {
+    const saved = localStorage.getItem('stackz-theme');
+    if (saved === 'retro') document.body.classList.add('retro');
+})();
+
+function toggleTheme() {
+    const isRetro = document.body.classList.toggle('retro');
+    document.getElementById('themeToggle').textContent = isRetro ? '◈ futuristic' : '◈ retro';
+    document.getElementById('themeToggle').style.color = '';
+    localStorage.setItem('stackz-theme', isRetro ? 'retro' : 'default');
+}
+
+// set button text correctly on load
+window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggle');
+    if (btn && document.body.classList.contains('retro')) {
+        btn.textContent = '◈ futuristic';
+    }
+});
+
+function sortCards(by) {
+    // update active button
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`sort-${by}`).classList.add('active');
+
+    const grid = document.querySelector('.grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    const verdictOrder = { buy: 0, short: 1, sell: 2, hold: 3 };
+
+    cards.sort((a, b) => {
+        const ta = a.dataset.ticker;
+        const tb = b.dataset.ticker;
+        const da = tickerData[ta]?.verdict_data || {};
+        const db = tickerData[tb]?.verdict_data || {};
+
+        if (by === 'confidence') {
+            return (db.confidence || 0) - (da.confidence || 0); // highest first
+        }
+        if (by === 'verdict') {
+            return (verdictOrder[da.verdict] ?? 9) - (verdictOrder[db.verdict] ?? 9);
+        }
+        if (by === 'ticker') {
+            return ta.localeCompare(tb);
+        }
+    });
+
+    cards.forEach(card => grid.appendChild(card));
+}
 </script>
 
 </body>

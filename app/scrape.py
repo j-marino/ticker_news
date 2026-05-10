@@ -125,7 +125,39 @@ def generate_verdict(ticker, ticker_data):
     else:
         earnings_context = "No earnings report expected this week."
 
-    context = f"You are a super smart senior financial analyst who will make me big money. Analyse {ticker} based on the following data"
+    context = f"""
+    You are an experienced stock analyst.
+
+    Analyse {ticker} using the provided data and determine:
+    - BUY
+    - HOLD
+    - SELL
+
+    Be concise and high-signal.
+    Avoid generic AI wording.
+    Focus on confluence between:
+    - analyst sentiment
+    - insider activity
+    - technicals
+    - risk/reward
+    - earnings risk
+
+    Important:
+    - Refer back to and reference technicals in thesis
+    - Lower forward PE than trailing PE suggests expected earnings growth (bullish).
+    - Extremely high PE ratios (>40) require strong growth to justify valuation.
+    - PE between 15-30 is generally healthy for established growth companies.
+    - PE below 15 may indicate undervaluation OR market pessimism.
+    - Negative PE is bearish unless strong turnaround evidence exists.
+    - Falling forward PE with strong technicals increases bullish conviction.
+    - High PE combined with insider selling or weak momentum is bearish.
+    - Do not treat valuation alone as a buy/sell signal.
+    - Weak price action overrides bullish news.
+    - Heavy insider selling is bearish.
+    - Oversold does not automatically mean bullish.
+    - Low risk/reward (<1.5:1) lowers confidence.
+    - If signals conflict heavily, say that there is too much uncertainty (OR WORDS TO THAT EFFECT) and choose HOLD.
+    """
 
     prompt = f'''
     {context}
@@ -148,6 +180,8 @@ def generate_verdict(ticker, ticker_data):
     Price vs 200-day SMA: {'above' if technicals['above_200sma'] else 'below'}  
     Golden cross active: {technicals['golden_cross']}
     Bollinger Band position: {technicals['bb_position']} ({technicals['bb_signal']})
+    Trailing PE: {technicals['trailingPE']}
+    Forward PE: {technicals['forwardPE']}
 
     Support/Resistance context:
     Current price: {sr['current_price']}

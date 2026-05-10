@@ -1,0 +1,563 @@
+/* ─────────────────────────────────────────────
+   WINDOWS 98 / XP CLASSIC RETRO THEME
+   ───────────────────────────────────────────── */
+
+/* ── THEME TOGGLE BUTTON ── */
+
+body.retro .theme-toggle {
+    position: static;
+    top: auto;
+    right: auto;
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+    padding: 4px 10px;
+
+    background: #c0c0c0;
+    color: black;
+
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    cursor: pointer;
+    width: auto;
+    margin-top: 0;
+    margin-bottom: 12px;
+    box-shadow: none;
+    text-transform: none;
+    letter-spacing: 0;
+    transition: all 0.1s;
+    z-index: auto;
+    display: inline-block;
+}
+
+body.retro .theme-toggle::before {
+    display: none;
+}
+
+body.retro .theme-toggle:hover {
+    background: #d6d6d6;
+    box-shadow: none;
+    transform: none;
+}
+
+body.retro .theme-toggle:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ── SORT BUTTONS ── */
+
+body.retro .sort-btn {
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    color: black;
+    border-radius: 0;
+    cursor: pointer;
+    letter-spacing: 0;
+    transition: all 0.1s;
+}
+
+body.retro .sort-btn:hover {
+    background: #d6d6d6;
+}
+
+body.retro .sort-btn.active {
+    background: #000080;
+    color: white;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    font-weight: bold;
+}
+
+/* ─────────────────────────────────────────────
+   RETRO ROOT
+   ───────────────────────────────────────────── */
+
+body.retro {
+    --bg: #008080;
+    --bg-card: #c0c0c0;
+
+    --border-light: #ffffff;
+    --border-mid: #808080;
+    --border-dark: #404040;
+
+    --text: #000000;
+    --text-muted: #202020;
+    --text-dim: #505050;
+
+    --green: #008000;
+    --yellow: #808000;
+    --red: #800000;
+
+    --mono: 'Tahoma', 'MS Sans Serif', sans-serif;
+    --sans: 'Tahoma', 'MS Sans Serif', sans-serif;
+
+    background: #008080;
+    color: black;
+
+    font-family: Tahoma, sans-serif;
+
+    image-rendering: pixelated;
+}
+
+/* Remove futuristic effects */
+
+body.retro::before,
+body.retro::after {
+    display: none;
+}
+
+
+/* ─────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────── */
+
+body.retro header {
+    background: #c0c0c0;
+    font-size: 13px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    box-shadow: none;
+}
+
+
+/* ─────────────────────────────────────────────
+   LOGO
+   ───────────────────────────────────────────── */
+
+body.retro .logo {
+    color: black;
+
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+
+    text-shadow: none;
+    letter-spacing: 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   PAGE TITLE
+   ───────────────────────────────────────────── */
+
+body.retro .page-title {
+    color: white;
+
+    font-weight: bold;
+
+    text-shadow:
+        1px 1px 0 #000;
+
+    letter-spacing: 1px;
+}
+
+body.retro .page-title::before {
+    content: '';
+}
+
+
+/* ─────────────────────────────────────────────
+   WINDOWS STYLE CARD
+   ───────────────────────────────────────────── */
+
+body.retro .card {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    box-shadow: none;
+
+    overflow: hidden;
+    padding: 3px;
+}
+
+body.retro .card:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+/* ── RETRO THEME BUTTON POSITIONING ── */
+
+body.retro header .theme-toggle {
+    position: static;
+    margin: 0;
+    margin-left: 20px;
+}
+
+body.retro .verify-page .theme-toggle {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* ─────────────────────────────────────────────
+   CARD TITLE BAR
+   ───────────────────────────────────────────── */
+
+body.retro .card-header {
+    background: linear-gradient(
+        90deg,
+        #000080 0%,
+        #1084d0 100%
+    );
+
+    color: white;
+
+    padding: 6px 8px;
+
+    border-bottom: 2px solid #808080;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    margin: 0;
+}
+
+body.retro .ticker-name {
+    color: white;
+    text-shadow: none;
+}
+
+
+/* ─────────────────────────────────────────────
+   CARD CONTENT
+   ───────────────────────────────────────────── */
+
+body.retro .card-content {
+    padding: 14px;
+}
+
+
+/* ─────────────────────────────────────────────
+   BUTTONS
+   ───────────────────────────────────────────── */
+
+body.retro button,
+body.retro .auth-btn,
+body.retro .logout-btn {
+    background: #c0c0c0;
+    color: black;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    box-shadow: none;
+
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+body.retro button:hover,
+body.retro .auth-btn:hover,
+body.retro .logout-btn:hover {
+    background: #d6d6d6;
+}
+
+body.retro button:active,
+body.retro .auth-btn:active,
+body.retro .logout-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+
+/* ─────────────────────────────────────────────
+   INPUTS
+   ───────────────────────────────────────────── */
+
+body.retro input,
+body.retro textarea,
+body.retro select {
+    background: white;
+    color: black;
+
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+
+    border-radius: 0;
+
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+
+    box-shadow: none;
+}
+
+body.retro input:focus,
+body.retro textarea:focus,
+body.retro select:focus {
+    outline: 1px dotted black;
+    outline-offset: -4px;
+}
+
+
+/* ─────────────────────────────────────────────
+   SIGNAL TAGS
+   ───────────────────────────────────────────── */
+
+body.retro .signal {
+    background: #d4d0c8;
+
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid #404040;
+    border-bottom: 1px solid #404040;
+
+    color: black;
+
+    font-size: 11px;
+    font-family: Tahoma, sans-serif;
+
+    border-radius: 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   VERDICT BADGES
+   ───────────────────────────────────────────── */
+
+body.retro .verdict-buy,
+body.retro .verdict-hold,
+body.retro .verdict-sell,
+body.retro .verdict-short {
+    font-weight: bold;
+
+    border-radius: 0;
+    box-shadow: none;
+
+    padding: 3px 8px;
+}
+
+body.retro .verdict-buy {
+    background: #00aa00;
+    color: white;
+}
+
+body.retro .verdict-hold {
+    background: #cccc00;
+    color: black;
+}
+
+body.retro .verdict-sell,
+body.retro .verdict-short {
+    background: #aa0000;
+    color: white;
+}
+
+
+/* ─────────────────────────────────────────────
+   CONFIDENCE BARS
+   ───────────────────────────────────────────── */
+
+body.retro .confidence-bar.buy {
+    background: #00aa00;
+}
+
+body.retro .confidence-bar.hold {
+    background: #cccc00;
+}
+
+body.retro .confidence-bar.sell,
+body.retro .confidence-bar.short {
+    background: #aa0000;
+}
+
+
+/* ─────────────────────────────────────────────
+   FACTORS LIST
+   ───────────────────────────────────────────── */
+
+body.retro .factors li::before {
+    content: '■ ';
+    color: black;
+}
+
+
+/* ─────────────────────────────────────────────
+   ANALYST BARS
+   ───────────────────────────────────────────── */
+
+body.retro .bar-strong-buy,
+body.retro .bar-buy {
+    background: #00aa00;
+    box-shadow: none;
+}
+
+body.retro .bar-hold {
+    background: #cccc00;
+    box-shadow: none;
+}
+
+body.retro .bar-sell,
+body.retro .bar-strong-sell {
+    background: #aa0000;
+    box-shadow: none;
+}
+
+
+/* ─────────────────────────────────────────────
+   MODAL
+   ───────────────────────────────────────────── */
+
+body.retro .modal {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    box-shadow: none;
+
+    overflow: hidden;
+}
+
+body.retro .modal-header {
+    background: linear-gradient(
+        90deg,
+        #000080 0%,
+        #1084d0 100%
+    );
+
+    color: white;
+
+    padding: 8px 10px;
+
+    border-bottom: 2px solid #808080;
+
+    border-radius: 0;
+
+    font-weight: bold;
+}
+
+body.retro .modal-summary {
+    font-size: 12px;
+    color: black;
+}
+
+
+/* ─────────────────────────────────────────────
+   CLOSE BUTTON
+   ───────────────────────────────────────────── */
+
+body.retro .modal-close {
+    width: 18px;
+    height: 18px;
+
+    background: #c0c0c0;
+    color: black;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    box-shadow: none;
+}
+
+body.retro .modal-close:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+
+/* ─────────────────────────────────────────────
+   AUTH BOX
+   ───────────────────────────────────────────── */
+
+body.retro .auth-box {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    box-shadow: none;
+}
+
+body.retro .auth-logo {
+    color: black;
+
+    text-shadow: none;
+
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+}
+
+
+/* ─────────────────────────────────────────────
+   REMOVE ALL MODERN EFFECTS
+   ───────────────────────────────────────────── */
+
+body.retro * {
+    text-shadow: none !important;
+    box-shadow: none;
+    backdrop-filter: none !important;
+    filter: none !important;
+}
+
+
+/* ─────────────────────────────────────────────
+   SCROLLBAR (WINDOWS STYLE)
+   ───────────────────────────────────────────── */
+
+body.retro ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+body.retro ::-webkit-scrollbar-track {
+    background: #c0c0c0;
+}
+
+body.retro ::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+}
+
+body.retro ::-webkit-scrollbar-corner {
+    background: #c0c0c0;
+}

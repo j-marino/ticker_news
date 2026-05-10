@@ -7,6 +7,8 @@ from random import randint
 
 import os
 import jwt
+import string
+import re
 from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
 from fastapi import FastAPI, Request, Form
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -18,6 +20,10 @@ from contextlib import asynccontextmanager
 from pydantic import BaseModel, EmailStr
 from dotenv import load_dotenv
 from database import get_all_verdicts
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 
 load_dotenv()
 
@@ -37,7 +43,7 @@ class TokenData(BaseModel):
 class User(SQLModel):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(default=None, index=True)
-    email: EmailStr = Field(default=None)
+    email: EmailStr = Field(default=None, index=True)
     disabled: bool | None
 
 
@@ -79,8 +85,12 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-
+# rate limiting + app setup  
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) 
+
 SessionDep = Annotated[Session, Depends(get_session)]
 
 conf = ConnectionConfig(
@@ -99,28 +109,31 @@ templates = Jinja2Templates(directory="/home/jman/newsletter/templates")
 app.mount("/static", StaticFiles(directory="/home/jman/newsletter/static"), name="static") 
 
 @app.get("/login", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def login_page(request: Request):
     return templates.TemplateResponse(request=request, name="login.html", context={"error": None})
 
 
 @app.get("/register", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def register_page(request: Request):
     return templates.TemplateResponse(request=request, name="register.html", context={"error": None})
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
+@limiter.limit("5/minute")
 async def dashboard(request: Request):
     token = request.cookies.get("access_token")
     if not token:
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/login")
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if not username:
-            return RedirectResponse(url="/")
+            return RedirectResponse(url="/login")
     except InvalidTokenError:
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/login")
 
     tickers = get_all_verdicts()
 
@@ -132,6 +145,7 @@ async def dashboard(request: Request):
 
 
 @app.post("/login")
+@limiter.limit("5/minute")
 async def login(request: Request, session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = authenticate_user(session, form_data.username, form_data.password)
     if not user:
@@ -152,12 +166,34 @@ async def login(request: Request, session: SessionDep, form_data: Annotated[OAut
 
 @app.get("/logout")
 async def logout():
-    response = RedirectResponse(url="/")
+    response = RedirectResponse(url="/login")
     response.delete_cookie("access_token")
     return response
 
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
+
+
+# prevent client side circumventing the password limits
+def validate_password(password: str) -> bool:
+    return (
+        len(password) >= 8 and
+        bool(re.search(r'[A-Z]', password)) and
+        bool(re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password))
+    )
+
+def validate_username(username: str) -> bool:
+    valid_characters = f"{string.ascii_letters}_0123456789" 
+    invalid_name = None
+    for letter in username:
+        if letter not in valid_characters:
+            invalid_name = True
+
+    return (
+        len(username) >= 4 and  len(username) <= 12 and 
+        not(invalid_name)
+    )
+
 
 
 def get_password_hash(password):
@@ -267,6 +303,7 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 @app.post("/register")
+@limiter.limit("5/minute")
 async def create_user(
     session: SessionDep, 
     request: Request, 
@@ -274,13 +311,37 @@ async def create_user(
     email: EmailStr = Form(...),
     password: str = Form(...),
 ):
-    existing = session.exec(select(UserInDB).where(UserInDB.username == username)).first()
-    if existing:
+    if not validate_password(password):
+        return templates.TemplateResponse(
+            request=request,
+            name="register.html",
+            context={"error": "password must be 8+ chars with 1 uppercase and 1 symbol"}
+        )
+    
+    if not validate_username(username):
+        return templates.TemplateResponse(
+            request=request,
+            name="register.html",
+            context={"error": "username can only contain underscores and numbers and ASCII characters"}
+        )
+
+
+    existing_username = session.exec(select(UserInDB).where(UserInDB.username == username)).first()
+    existing_email = session.exec(select(UserInDB).where(UserInDB.email == email)).first()
+    if existing_username:
         return templates.TemplateResponse(
             request=request,
             name="login.html", 
             context={"error": "Username already taken"}
         )
+    
+    if existing_email:
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html", 
+            context={"error": "Email already in use"}
+        )
+    
     
     generated_code = generate_code()
 
@@ -356,7 +417,7 @@ async def email_verify(
     session.commit()
 
     # clear the pending cookie and redirect to login
-    response = RedirectResponse(url="/", status_code=302)
+    response = RedirectResponse(url="/login", status_code=302)
     response.delete_cookie("pending_username")
     return response
 

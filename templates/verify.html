@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$tackz — Verify Email</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/retro-theme.css">
 </head>
-<body>
 
+<body>
 <div class="verify-page">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">◈ retro</button>
     <div class="verify-box">
         <div class="auth-logo" style="font-size:20px; margin-bottom:16px;">$tackz</div>
         <h2>Check your email</h2>
@@ -19,11 +21,32 @@
         {% endif %}
 
         <form action="/verify" method="post">
-            <input type="number" name="inputted_code" placeholder="000000" min="100000" max="999999" required>
+            <input type="text" name="inputted_code" placeholder="000000" min="100000" max="999999" required>
             <button type="submit" class="auth-btn">VERIFY</button>
         </form>
     </div>
 </div>
+<script>
+(function() {
+    const saved = localStorage.getItem('stackz-theme');
+    if (saved === 'retro') document.body.classList.add('retro');
+})();
+
+function toggleTheme() {
+    const isRetro = document.body.classList.toggle('retro');
+    document.getElementById('themeToggle').textContent = isRetro ? '◈ futuristic' : '◈ retro';
+    document.getElementById('themeToggle').style.color = '';
+    localStorage.setItem('stackz-theme', isRetro ? 'retro' : 'default');
+}
+
+// set button text correctly on load
+window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggle');
+    if (btn && document.body.classList.contains('retro')) {
+        btn.textContent = '◈ futuristic';
+    }
+});
+</script>
 
 </body>
 </html>

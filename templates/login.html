@@ -5,10 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>$tackz — Login</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/retro-theme.css">
+    <style>
+        .auth-box p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 16px;
+        }
+        .auth-box p a {
+            color: var(--green);
+            text-decoration: none;
+            font-family: var(--mono);
+        }
+    </style>
 </head>
 <body>
 
 <div class="auth-page">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">◈ retro</button>
     <div class="auth-logo">$tackz</div>
     <div class="auth-tagline">Tired of FOMO'ing on missed opportunities?</div>
 
@@ -29,6 +44,27 @@
 
     <p class="auth-disclaimer">⚠ not financial advice &nbsp;|&nbsp; for informational purposes only</p>
 </div>
+<script>
+(function() {
+    const saved = localStorage.getItem('stackz-theme');
+    if (saved === 'retro') document.body.classList.add('retro');
+})();
+
+function toggleTheme() {
+    const isRetro = document.body.classList.toggle('retro');
+    document.getElementById('themeToggle').textContent = isRetro ? '◈ futuristic' : '◈ retro';
+    document.getElementById('themeToggle').style.color = '';
+    localStorage.setItem('stackz-theme', isRetro ? 'retro' : 'default');
+}
+
+// set button text correctly on load
+window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggle');
+    if (btn && document.body.classList.contains('retro')) {
+        btn.textContent = '◈ futuristic';
+    }
+});
+</script>
 
 </body>
 </html>

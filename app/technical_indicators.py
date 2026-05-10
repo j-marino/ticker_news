@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+from scrape import finnhub_client
 
 def get_technicals(ticker):
     stock = yf.Ticker(ticker)
@@ -32,7 +33,7 @@ def get_technicals(ticker):
     
     latest = df.iloc[-1]
     prev = df.iloc[-2]
-    
+
     return {
         "current_price": round(latest['Close'], 2),
         "rsi": round(latest['RSI'], 1),
@@ -43,7 +44,9 @@ def get_technicals(ticker):
         "above_200sma": bool(latest['Close'] > latest['SMA200']),
         "golden_cross": bool(latest['SMA50'] > latest['SMA200']),
         "bb_position": round(latest['BB_position'], 2),  # 0=bottom of band, 1=top
-        "bb_signal": "overbought" if latest['BB_position'] > 0.8 else "oversold" if latest['BB_position'] < 0.2 else "neutral"
+        "bb_signal": "overbought" if latest['BB_position'] > 0.8 else "oversold" if latest['BB_position'] < 0.2 else "neutral",
+        "forwardPE": stock['forwardPE'],
+        "trailingPE": stock['trailingPE']
     }
 
 
