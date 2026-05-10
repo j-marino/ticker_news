@@ -105,8 +105,8 @@ conf = ConnectionConfig(
     VALIDATE_CERTS = True
 )
 
-templates = Jinja2Templates(directory="/home/jman/newsletter/templates")
-app.mount("/static", StaticFiles(directory="/home/jman/newsletter/static"), name="static") 
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static") 
 
 @app.get("/login", response_class=HTMLResponse)
 @limiter.limit("5/minute")
