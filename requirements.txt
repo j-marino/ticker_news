@@ -1,4 +1,4 @@
-fastapi
+fastapi[standard]
 uvicorn
 sqlmodel
 psycopg2-binary
@@ -10,7 +10,6 @@ email-validator
 dotenv
 finnhub-python
 ollama 
-redis[hiredis]
 jinja2
 yfinance
 pandas
