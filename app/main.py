@@ -63,6 +63,8 @@ class UserPublic(BaseModel):
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+print("DEBUGGING: DATABASE_URL =", DATABASE_URL)
+
 engine = create_engine(DATABASE_URL)
 
 password_hash = PasswordHash.recommended()
