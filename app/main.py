@@ -292,7 +292,8 @@ async def get_current_active_user(
 @limiter.limit("5/minute")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: SessionDep
+    session: SessionDep,
+    request: Request
 ) -> Token:
     user = authenticate_user(session, form_data.username, form_data.password)
     if not user:
