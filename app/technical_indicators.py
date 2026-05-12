@@ -8,6 +8,7 @@ def get_technicals(ticker):
         df = stock.history(period="3mo")  # 3 months of daily data
     
     except Exception as e:
+        print("NO NO NO BAD STOCK!git ")
         return ValueError(f'Handled Error: {e}, Bad stock pick. Has not existed for more than 3 months')
     
     # RSI
