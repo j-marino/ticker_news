@@ -244,8 +244,8 @@ def authenticate_user(session: Session, username: str, password: str):
     return user
 
 
-async def send_email_verification(email: EmailStr, code: int, recipient):
-    template = f"""
+async def send_email_verification(recipient: EmailStr, code: int):
+    template = f""" 
         <html>
         <body>
             <h2>Welcome to $tackz 📈</h2>
