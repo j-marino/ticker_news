@@ -28,6 +28,12 @@ engine = create_engine(DATABASE_URL)
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
+def db_empty():
+    with Session(engine) as session:
+        query = session.exec(select(Verdict).where(Verdict.id == 1)).first()
+        return query is None
+
+
 def store_verdicts(verdicts: dict, profiles: dict):
     with Session(engine) as session:
         for ticker, verdict_data in verdicts.items():

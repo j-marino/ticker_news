@@ -9,9 +9,10 @@ python-multipart
 email-validator
 dotenv
 finnhub-python
-ollama 
 jinja2
 yfinance
 pandas
-fastapi_mail
+resend
 slowapi
+apscheduler
+google-genai

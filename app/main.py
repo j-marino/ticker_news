@@ -9,9 +9,16 @@ import os
 import jwt
 import string
 import re
+import asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+
 from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
 from fastapi import FastAPI, Request, Form
 from fastapi import Depends, FastAPI, HTTPException, status
+
+import resend
+
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
@@ -79,13 +86,46 @@ def get_session():
         yield session
 
 
+async def run_populate():
+    from cron_populate_db import populate
+    await asyncio.to_thread(populate)  # run blocking code in thread
+
+
+async def populate_background():
+    from cron_populate_db import populate
+    try:
+        await asyncio.to_thread(populate)
+        print("Background populate complete")
+    except Exception as e:
+        print(f"Background populate failed: {e}")
+
+
+async def run_depopulate():
+    from cron_depopulate_db import depopulate
+    await asyncio.to_thread(depopulate)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+
+    # prevent startup block
+    asyncio.create_task(populate_background())
+
+    # depopulate first 
+    # weekdays 6:45am UTC
+    scheduler.add_job(run_depopulate, CronTrigger(hour=6, minute=45, day_of_week='mon-fri'))
+    # weekdays 7am UTC
+    scheduler.add_job(run_populate, CronTrigger(hour=7, minute=0, day_of_week='mon-fri'))
+    
+    scheduler.start()
     yield
+    scheduler.shutdown()
 
 # rate limiting + app setup  
 limiter = Limiter(key_func=get_remote_address)
+scheduler = AsyncIOScheduler()
+resend.api_key = os.getenv("RESEND_API_KEY")
 app = FastAPI(lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) 
@@ -168,11 +208,13 @@ async def login(request: Request, session: SessionDep, form_data: Annotated[OAut
     response.set_cookie(key="access_token", value=access_token, secure=True, httponly=True)
     return response
 
+
 @app.get("/logout")
 async def logout():
     response = RedirectResponse(url="/login")
     response.delete_cookie("access_token")
     return response
+
 
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
@@ -186,6 +228,7 @@ def validate_password(password: str) -> bool:
         bool(re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password))
     )
 
+
 def validate_username(username: str) -> bool:
     valid_characters = f"{string.ascii_letters}_0123456789" 
     invalid_name = False
@@ -197,7 +240,6 @@ def validate_username(username: str) -> bool:
         len(username) >= 4 and  len(username) <= 12 and 
         not(invalid_name)
     )
-
 
 
 def get_password_hash(password):
@@ -218,7 +260,7 @@ def authenticate_user(session: Session, username: str, password: str):
     return user
 
 
-async def send_email_verification(email: EmailStr, code: int):
+async def send_email_verification(email: EmailStr, code: int, recipient):
     template = f"""
         <html>
         <body>
@@ -231,17 +273,15 @@ async def send_email_verification(email: EmailStr, code: int):
         </html>
     """
 
-    message = MessageSchema(
-        subject="$tackz — verify your account",
-        recipients=[email],  # must be a list
-        body=template,
-        subtype="html"
-    )
+    params: resend.Emails.SendParams = {
+        "from": "stackznoreply@gmail.com",
+        "to": [recipient],
+        "subject": "$tackz — verify your account",
+        "html": template,
+    }
 
-    fm = FastMail(conf)
-    await fm.send_message(message)
-    return JSONResponse(status_code=200, content={"message": "email has been sent"})
-
+    email: resend.Emails.SendResponse = resend.Emails.send(params)
+    return email
 
 def generate_code():
     low, high = 100000, 999999 # 6 digit code
