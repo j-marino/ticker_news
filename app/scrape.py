@@ -146,6 +146,7 @@ def get_recommendation_data(finnhub_client, parsed):
             technicals = get_technicals(ticker)
             sr = get_support_resistance(ticker)
         except Exception:
+            print(f"Skipping {ticker} — technicals failed: {e}")
             continue
 
         ticker_to_data[ticker] = {
