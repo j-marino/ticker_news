@@ -1,6 +1,5 @@
 import yfinance as yf
 import pandas as pd
-from scrape import finnhub_client
 
 def get_technicals(ticker):
     stock = yf.Ticker(ticker)
