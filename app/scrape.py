@@ -15,7 +15,7 @@ import yfinance as yf
 import requests
 
 load_dotenv()
-url = 'api.finnhub.io'
+url = 'https://api.finnhub.io'
 requests.get(url, timeout=30)
 
 
