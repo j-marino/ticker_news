@@ -29,8 +29,8 @@ def create_db_and_tables():
 
 def db_empty():
     with Session(engine) as session:
-        query = session.exec(select(Verdict).where(Verdict.id == 1)).first()
-        return query is None
+        count = session.exec(select(Verdict)).all()
+        return len(count) == 0
 
 
 def store_verdicts(verdicts: dict, profiles: dict):
