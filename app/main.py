@@ -90,6 +90,7 @@ async def run_populate():
 async def populate_background():
     from cron_populate_db import populate
     try:
+        print("Background db population starting...")
         await asyncio.to_thread(populate)
         print("Background populate complete")
     except Exception as e:

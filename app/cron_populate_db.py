@@ -7,6 +7,7 @@ def populate():
     from scrape import generate_all_verdicts, get_recommendation_data, get_company_profiles, get_marketaux_data, get_finnhub_client
     from database import store_verdicts, db_empty
 
+    print("Inside Populate Function...")
     if db_empty():
         finnhub_client = get_finnhub_client()
         parsed = get_marketaux_data()
