@@ -5,6 +5,9 @@ def get_technicals(ticker):
     stock = yf.Ticker(ticker)
     df = stock.history(period="3mo")  # 3 months of daily data
     
+    if df.empty:
+        raise ValueError(f"No price data for {ticker} — possibly delisted")
+    
     # RSI
     delta = df['Close'].diff()
     gain = delta.where(delta > 0, 0).rolling(14).mean()
@@ -52,6 +55,9 @@ def get_technicals(ticker):
 def get_support_resistance(ticker):
     stock = yf.Ticker(ticker)
     df = stock.history(period="6mo")
+
+    if df.empty:
+        raise ValueError(f"No price data for {ticker}")
     
     # recent highs and lows as resistance/support
     # look at 20-day rolling windows

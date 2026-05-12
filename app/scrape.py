@@ -126,7 +126,15 @@ def get_final_watchlist(finnhub_client, parsed):
     earnings_tickers = get_quality_earnings_tickers(finnhub_client)
     av_tickers = [t["ticker"] for t in extract_av_tickers()]
     merged = list(set(news_tickers + earnings_tickers + av_tickers))
-    return merged[:15]
+
+    filtered = [
+        t for t in merged
+        if not t.startswith('$')      # Stocktwits format
+        and '.' not in t              # foreign listings like BRK.B
+        and len(t) <= 5               # max 5 chars (GOOGL, TSLA etc)
+        and t.isalpha()               # letters only, no numbers like SABRP
+    ]
+    return filtered[:15]
 
 
 def get_recommendation_data(finnhub_client, parsed):
@@ -145,6 +153,17 @@ def get_recommendation_data(finnhub_client, parsed):
         try:
             technicals = get_technicals(ticker)
             sr = get_support_resistance(ticker)
+
+            # validate we actually got data back
+            if not technicals or not sr:
+                print(f"Skipping {ticker} — empty technicals/sr returned")
+                continue
+                
+            # validate key fields exist
+            if technicals.get('rsi') is None or sr.get('current_price') is None:
+                print(f"Skipping {ticker} — incomplete technicals data")
+                continue
+            
         except Exception as e:
             print(f"Skipping {ticker} — technicals failed: {e}")
             continue
