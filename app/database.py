@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 import os
-import json
 from sqlmodel import Field, SQLModel, create_engine, Session, select
-from sqlalchemy import Column, text, delete
+from sqlalchemy import Column, delete
 from sqlalchemy.dialects.postgresql import JSONB
 from dotenv import load_dotenv
 

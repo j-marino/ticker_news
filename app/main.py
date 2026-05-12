@@ -106,11 +106,7 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
 
     # prevent startup block
-    # asyncio.create_task(populate_background())
-    try:
-        run_populate()
-    except Exception as e:
-        print(f"population failed as {e}")
+    asyncio.create_task(populate_background())
 
     # depopulate first 
     # weekdays 6:45am UTC
@@ -262,7 +258,7 @@ async def send_email_verification(recipient: EmailStr, code: int):
     """
 
     params: resend.Emails.SendParams = {
-"       from": "onboarding@resend.dev",        
+        "from": "stackz <onboarding@resend.dev>",       
         "to": [recipient],
         "subject": "$tackz — verify your account",
         "html": template,
