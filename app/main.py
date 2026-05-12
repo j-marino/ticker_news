@@ -10,15 +10,9 @@ import jwt
 import string
 import re
 import asyncio
+import resend
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-
-from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
-from fastapi import FastAPI, Request, Form
-from fastapi import Depends, FastAPI, HTTPException, status
-
-import resend
-
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
