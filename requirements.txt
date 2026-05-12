@@ -6,12 +6,10 @@ alembic
 pwdlib[argon2]
 pyjwt
 python-multipart
-email-validator
 dotenv
 finnhub-python
 jinja2
 yfinance
-pandas
 resend
 slowapi
 apscheduler
