@@ -3,10 +3,12 @@ import pandas as pd
 
 def get_technicals(ticker):
     stock = yf.Ticker(ticker)
-    df = stock.history(period="3mo")  # 3 months of daily data
+
+    try:
+        df = stock.history(period="3mo")  # 3 months of daily data
     
-    if df.empty:
-        raise ValueError(f"No price data for {ticker} — possibly delisted")
+    except Exception as e:
+        return ValueError(f'Handled Error: {e}, Bad stock pick. Has not existed for more than 3 months')
     
     # RSI
     delta = df['Close'].diff()
