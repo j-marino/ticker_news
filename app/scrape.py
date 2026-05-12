@@ -12,8 +12,12 @@ from datetime import date, timedelta
 from technical_indicators import get_technicals, get_support_resistance
 from vantage_intel import extract_av_tickers
 import yfinance as yf
+import requests
 
 load_dotenv()
+url = 'api.finnhub.io'
+requests.get(url, timeout=30)
+
 
 # Gemini model fallback chain
 GEMINI_MODELS = [
