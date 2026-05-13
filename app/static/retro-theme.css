@@ -2,58 +2,97 @@
    WINDOWS 98 / XP CLASSIC RETRO THEME
    ───────────────────────────────────────────── */
 
-/* ── THEME TOGGLE BUTTON ── */
+/* ── RETRO ROOT ── */
+body.retro {
+    --bg: #008080;
+    --bg-card: #c0c0c0;
+    --border-light: #ffffff;
+    --border-mid: #808080;
+    --border-dark: #404040;
+    --text: #000000;
+    --text-muted: #1a1a1a;
+    --text-dim: #2a2a2a;
+    --green: #008000;
+    --yellow: #808000;
+    --red: #800000;
+    --mono: 'Tahoma', 'MS Sans Serif', sans-serif;
+    --sans: 'Tahoma', 'MS Sans Serif', sans-serif;
 
-body.retro .theme-toggle {
-    position: static;
-    top: auto;
-    right: auto;
-    font-family: Tahoma, sans-serif;
-    font-size: 11px;
-    padding: 4px 10px;
-
-    background: #c0c0c0;
+    background-color: #008080;
     color: black;
+    font-family: Tahoma, sans-serif;
+    font-size: 13px;
+    image-rendering: pixelated;
+}
 
-    border-top: 2px solid #ffffff;
-    border-left: 2px solid #ffffff;
+/* ── RETRO BACKGROUND — tiled Windows 98 diamond pattern ── */
+body.retro::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+
+    /* Classic Windows teal desktop texture */
+    background-color: #008080;
+    background-image:
+        /* diagonal cross-hatch in a darker teal */
+        repeating-linear-gradient(
+            45deg,
+            rgba(0,0,0,0.06) 0px,
+            rgba(0,0,0,0.06) 1px,
+            transparent 1px,
+            transparent 8px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            rgba(0,0,0,0.06) 0px,
+            rgba(0,0,0,0.06) 1px,
+            transparent 1px,
+            transparent 8px
+        );
+    background-size: 16px 16px;
+
+    /* no animation — static like real Win98 */
+    animation: none;
+}
+
+/* remove the scanline animation override */
+body.retro::after { display: none; }
+
+/* ── HEADER ── */
+body.retro header {
+    background: #c0c0c0;
+    font-size: 13px;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
-    border-radius: 0;
-    cursor: pointer;
-    width: auto;
-    margin-top: 0;
-    margin-bottom: 12px;
     box-shadow: none;
-    text-transform: none;
+    backdrop-filter: none;
+}
+
+/* ── LOGO ── */
+body.retro .logo {
+    color: black;
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: none;
     letter-spacing: 0;
-    transition: all 0.1s;
-    z-index: auto;
-    display: inline-block;
 }
 
-body.retro .theme-toggle::before {
-    display: none;
+/* ── PAGE TITLE ── */
+body.retro .page-title {
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #000;
+    letter-spacing: 1px;
 }
 
-body.retro .theme-toggle:hover {
-    background: #d6d6d6;
-    box-shadow: none;
-    transform: none;
-}
-
-body.retro .theme-toggle:active {
-    border-top: 2px solid #404040;
-    border-left: 2px solid #404040;
-    border-right: 2px solid #ffffff;
-    border-bottom: 2px solid #ffffff;
-    box-shadow: none;
-    transform: none;
-}
+body.retro .page-title::before { content: ''; }
 
 /* ── SORT BUTTONS ── */
-
 body.retro .sort-btn {
     font-family: Tahoma, sans-serif;
     font-size: 11px;
@@ -67,12 +106,10 @@ body.retro .sort-btn {
     border-radius: 0;
     cursor: pointer;
     letter-spacing: 0;
-    transition: all 0.1s;
+    transition: none;
 }
 
-body.retro .sort-btn:hover {
-    background: #d6d6d6;
-}
+body.retro .sort-btn:hover { background: #d6d6d6; }
 
 body.retro .sort-btn.active {
     background: #000080;
@@ -84,200 +121,148 @@ body.retro .sort-btn.active {
     font-weight: bold;
 }
 
-/* ─────────────────────────────────────────────
-   RETRO ROOT
-   ───────────────────────────────────────────── */
-
-body.retro {
-    --bg: #008080;
-    --bg-card: #c0c0c0;
-
-    --border-light: #ffffff;
-    --border-mid: #808080;
-    --border-dark: #404040;
-
-    --text: #000000;
-    --text-muted: #202020;
-    --text-dim: #505050;
-
-    --green: #008000;
-    --yellow: #808000;
-    --red: #800000;
-
-    --mono: 'Tahoma', 'MS Sans Serif', sans-serif;
-    --sans: 'Tahoma', 'MS Sans Serif', sans-serif;
-
-    background: #008080;
-    color: black;
-
+/* ── THEME TOGGLE ── */
+body.retro .theme-toggle {
     font-family: Tahoma, sans-serif;
-
-    image-rendering: pixelated;
-}
-
-/* Remove futuristic effects */
-
-body.retro::before,
-body.retro::after {
-    display: none;
-}
-
-
-/* ─────────────────────────────────────────────
-   HEADER
-   ───────────────────────────────────────────── */
-
-body.retro header {
+    font-size: 11px;
+    padding: 4px 12px;
     background: #c0c0c0;
-    font-size: 13px;
-    border-top: 2px solid white;
-    border-left: 2px solid white;
+    color: black;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
+    border-radius: 0;
+    cursor: pointer;
     box-shadow: none;
-}
-
-
-/* ─────────────────────────────────────────────
-   LOGO
-   ───────────────────────────────────────────── */
-
-body.retro .logo {
-    color: black;
-
-    font-family: Tahoma, sans-serif;
-    font-weight: bold;
-
-    text-shadow: none;
+    text-transform: none;
     letter-spacing: 0;
+    transition: none;
+    display: inline-block;
+    margin-bottom: 0;
 }
 
-
-/* ─────────────────────────────────────────────
-   PAGE TITLE
-   ───────────────────────────────────────────── */
-
-body.retro .page-title {
-    color: white;
-
-    font-weight: bold;
-
-    text-shadow:
-        1px 1px 0 #000;
-
-    letter-spacing: 1px;
+body.retro .theme-toggle::before { display: none; }
+body.retro .theme-toggle:hover { background: #d6d6d6; box-shadow: none; transform: none; }
+body.retro .theme-toggle:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    transform: none;
 }
 
-body.retro .page-title::before {
-    content: '';
-}
-
-
-/* ─────────────────────────────────────────────
-   WINDOWS STYLE CARD
-   ───────────────────────────────────────────── */
-
+/* ── CARD — Windows window chrome ── */
 body.retro .card {
     background: #c0c0c0;
-
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
     border-radius: 0;
     box-shadow: none;
-
     overflow: hidden;
-    padding: 3px;
+    padding: 0;
+    transform: none !important;
 }
 
 body.retro .card:hover {
     box-shadow: none;
-    transform: none;
+    transform: none !important;
 }
 
-/* ── RETRO THEME BUTTON POSITIONING ── */
+body.retro .card::before { display: none; }
 
-body.retro header .theme-toggle {
-    position: static;
-    margin: 0;
-    margin-left: 20px;
-}
-
-body.retro .verify-page .theme-toggle {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-/* ─────────────────────────────────────────────
-   CARD TITLE BAR
-   ───────────────────────────────────────────── */
-
+/* ── CARD TITLE BAR ── */
 body.retro .card-header {
-    background: linear-gradient(
-        90deg,
-        #000080 0%,
-        #1084d0 100%
-    );
-
+    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
     color: white;
-
-    padding: 6px 8px;
-
+    padding: 5px 8px;
     border-bottom: 2px solid #808080;
-
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
-
     margin: 0;
 }
 
-body.retro .ticker-name {
+body.retro .card-header .ticker-name {
     color: white;
     text-shadow: none;
+    font-size: 16px;
 }
 
-
-/* ─────────────────────────────────────────────
-   CARD CONTENT
-   ───────────────────────────────────────────── */
-
-body.retro .card-content {
-    padding: 14px;
+body.retro .card-header .company-name {
+    color: #c8d8f0;
+    max-width: 160px;
+    font-size: 11px;
 }
 
+/* ── CARD BODY — padding wrapper since card padding=0 ── */
+body.retro .industry-tag,
+body.retro .signal-row,
+body.retro .confidence-row,
+body.retro .factors,
+body.retro .card-footer {
+    margin-left: 10px;
+    margin-right: 10px;
+}
 
-/* ─────────────────────────────────────────────
-   BUTTONS
-   ───────────────────────────────────────────── */
+body.retro .industry-tag {
+    /* lighter inset area colour so text is readable */
+    background: #d4d0c8;
+    color: #000080;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    margin: 0;
+    border-bottom: 1px solid #808080;
+}
 
+body.retro .signal-row  { margin-top: 10px; }
+body.retro .factors     { margin-top: 4px; }
+body.retro .card-footer { margin-bottom: 8px; }
+
+/* ── CONFIDENCE BAR WRAP ── */
+body.retro .confidence-row {
+    margin-top: 8px;
+}
+
+body.retro .confidence-bar-wrap {
+    background: #808080;
+    height: 4px;
+    border-top: 1px solid #404040;
+    border-left: 1px solid #404040;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+    border-radius: 0;
+}
+
+body.retro .confidence-bar.buy   { background: #00aa00; }
+body.retro .confidence-bar.hold  { background: #cccc00; }
+body.retro .confidence-bar.sell,
+body.retro .confidence-bar.short { background: #aa0000; }
+
+/* ── BUTTONS ── */
 body.retro button,
 body.retro .auth-btn,
 body.retro .logout-btn {
     background: #c0c0c0;
     color: black;
-
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
     border-radius: 0;
     box-shadow: none;
-
     font-family: Tahoma, sans-serif;
-    font-size: 11px;
-
+    font-size: 12px;
     cursor: pointer;
+    transform: none !important;
 }
 
 body.retro button:hover,
 body.retro .auth-btn:hover,
-body.retro .logout-btn:hover {
-    background: #d6d6d6;
-}
+body.retro .logout-btn:hover { background: #d6d6d6; }
 
 body.retro button:active,
 body.retro .auth-btn:active,
@@ -288,207 +273,156 @@ body.retro .logout-btn:active {
     border-bottom: 2px solid white;
 }
 
-
-/* ─────────────────────────────────────────────
-   INPUTS
-   ───────────────────────────────────────────── */
-
+/* ── INPUTS ── */
 body.retro input,
 body.retro textarea,
 body.retro select {
     background: white;
     color: black;
-
     border-top: 2px solid #404040;
     border-left: 2px solid #404040;
     border-right: 2px solid white;
     border-bottom: 2px solid white;
-
     border-radius: 0;
-
     font-family: Tahoma, sans-serif;
-    font-size: 11px;
-
+    font-size: 12px;
     box-shadow: none;
 }
 
 body.retro input:focus,
-body.retro textarea:focus,
-body.retro select:focus {
+body.retro textarea:focus {
     outline: 1px dotted black;
     outline-offset: -4px;
+    border-color: inherit;
 }
 
-
-/* ─────────────────────────────────────────────
-   SIGNAL TAGS
-   ───────────────────────────────────────────── */
-
+/* ── SIGNALS ── */
 body.retro .signal {
     background: #d4d0c8;
-
     border-top: 1px solid white;
     border-left: 1px solid white;
     border-right: 1px solid #404040;
     border-bottom: 1px solid #404040;
-
     color: black;
-
     font-size: 11px;
     font-family: Tahoma, sans-serif;
-
     border-radius: 0;
 }
 
-
-/* ─────────────────────────────────────────────
-   VERDICT BADGES
-   ───────────────────────────────────────────── */
-
-body.retro .verdict-buy,
-body.retro .verdict-hold,
-body.retro .verdict-sell,
-body.retro .verdict-short {
+/* ── VERDICT BADGES ── */
+body.retro .verdict {
     font-weight: bold;
-
     border-radius: 0;
     box-shadow: none;
-
     padding: 3px 8px;
+    font-size: 11px;
 }
 
-body.retro .verdict-buy {
-    background: #00aa00;
-    color: white;
-}
-
-body.retro .verdict-hold {
-    background: #cccc00;
-    color: black;
-}
-
+body.retro .verdict-buy   { background: #006600; color: white; border: none; }
+body.retro .verdict-hold  { background: #cccc00; color: black; border: none; }
 body.retro .verdict-sell,
-body.retro .verdict-short {
-    background: #aa0000;
-    color: white;
+body.retro .verdict-short { background: #aa0000; color: white; border: none; }
+
+/* ── FACTORS ── */
+body.retro .factors li {
+    font-size: 12px;
+    color: #1a1a1a;
 }
-
-
-/* ─────────────────────────────────────────────
-   CONFIDENCE BARS
-   ───────────────────────────────────────────── */
-
-body.retro .confidence-bar.buy {
-    background: #00aa00;
-}
-
-body.retro .confidence-bar.hold {
-    background: #cccc00;
-}
-
-body.retro .confidence-bar.sell,
-body.retro .confidence-bar.short {
-    background: #aa0000;
-}
-
-
-/* ─────────────────────────────────────────────
-   FACTORS LIST
-   ───────────────────────────────────────────── */
 
 body.retro .factors li::before {
-    content: '■ ';
-    color: black;
+    content: '■';
+    color: #000080;
+    font-size: 8px;
+    margin-top: 3px;
 }
 
+/* ── CARD FOOTER ── */
+body.retro .card-footer {
+    border-top: 1px solid #808080;
+    color: #404040;
+    font-size: 10px;
+    font-family: Tahoma, sans-serif;
+}
 
-/* ─────────────────────────────────────────────
-   ANALYST BARS
-   ───────────────────────────────────────────── */
-
+/* ── ANALYST BARS ── */
 body.retro .bar-strong-buy,
-body.retro .bar-buy {
-    background: #00aa00;
-    box-shadow: none;
-}
-
-body.retro .bar-hold {
-    background: #cccc00;
-    box-shadow: none;
-}
-
+body.retro .bar-buy         { background: #00aa00; box-shadow: none; }
+body.retro .bar-hold        { background: #cccc00; box-shadow: none; }
 body.retro .bar-sell,
-body.retro .bar-strong-sell {
-    background: #aa0000;
-    box-shadow: none;
+body.retro .bar-strong-sell { background: #aa0000; box-shadow: none; }
+
+body.retro .bar-label { color: #404040; font-family: Tahoma, sans-serif; }
+body.retro .bar-value { color: #000000; font-family: Tahoma, sans-serif; }
+
+/* ── MODAL ── */
+body.retro .modal-overlay {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: none;
 }
-
-
-/* ─────────────────────────────────────────────
-   MODAL
-   ───────────────────────────────────────────── */
 
 body.retro .modal {
     background: #c0c0c0;
-
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
     border-radius: 0;
-    box-shadow: none;
-
-    overflow: hidden;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
 }
 
 body.retro .modal-header {
-    background: linear-gradient(
-        90deg,
-        #000080 0%,
-        #1084d0 100%
-    );
-
+    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
     color: white;
-
-    padding: 8px 10px;
-
+    padding: 8px 12px;
+    margin-bottom: 16px;
     border-bottom: 2px solid #808080;
-
     border-radius: 0;
-
     font-weight: bold;
+    font-family: Tahoma, sans-serif;
+}
+
+body.retro .modal-body {
+    padding: 0 16px 16px;
 }
 
 body.retro .modal-summary {
     font-size: 12px;
     color: black;
+    background: white;
+    border: inset 2px;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    border-radius: 0;
+    padding: 10px;
+    line-height: 1.6;
 }
 
+body.retro .analyst-chart h4 {
+    color: #000080;
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+    letter-spacing: 0;
+}
 
-/* ─────────────────────────────────────────────
-   CLOSE BUTTON
-   ───────────────────────────────────────────── */
-
+/* ── MODAL CLOSE ── */
 body.retro .modal-close {
-    width: 18px;
-    height: 18px;
-
+    width: 20px;
+    height: 20px;
     background: #c0c0c0;
     color: black;
-
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
     border-radius: 0;
-
     font-size: 11px;
     font-weight: bold;
-
     box-shadow: none;
 }
+
+body.retro .modal-close:hover { border-color: inherit; color: black; background: #d6d6d6; }
 
 body.retro .modal-close:active {
     border-top: 2px solid #404040;
@@ -497,67 +431,86 @@ body.retro .modal-close:active {
     border-bottom: 2px solid white;
 }
 
-
-/* ─────────────────────────────────────────────
-   AUTH BOX
-   ───────────────────────────────────────────── */
+/* ── AUTH BOX ── */
+body.retro .auth-page {
+    background: transparent;
+}
 
 body.retro .auth-box {
     background: #c0c0c0;
-
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-
     border-radius: 0;
-    box-shadow: none;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    width: 280px;
 }
 
 body.retro .auth-logo {
-    color: black;
-
-    text-shadow: none;
-
+    color: white;
+    text-shadow: 1px 1px 0 #000, 2px 2px 0 #004040;
     font-family: Tahoma, sans-serif;
-    font-weight: bold;
+    font-size: 28px;
 }
 
+body.retro .auth-tagline {
+    color: #d0f0f0;
+    text-shadow: 1px 1px 0 #004040;
+    font-family: Tahoma, sans-serif;
+}
 
-/* ─────────────────────────────────────────────
-   REMOVE ALL MODERN EFFECTS
-   ───────────────────────────────────────────── */
+body.retro .auth-disclaimer {
+    color: #c0e0e0;
+    text-shadow: 1px 1px 0 #004040;
+}
 
+body.retro .auth-box h2 {
+    color: black;
+    font-family: Tahoma, sans-serif;
+    letter-spacing: 0;
+    font-size: 12px;
+}
+
+body.retro .auth-box p { color: #404040; }
+body.retro .auth-box p a { color: #000080; }
+
+/* ── VERIFY BOX ── */
+body.retro .verify-box {
+    background: #c0c0c0;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+body.retro .verify-box h2 { font-family: Tahoma, sans-serif; color: black; }
+body.retro .verify-box p  { color: #404040; }
+
+/* ── SCROLLBAR ── */
+body.retro ::-webkit-scrollbar { width: 16px; height: 16px; }
+body.retro ::-webkit-scrollbar-track { background: #c0c0c0; }
+body.retro ::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+}
+body.retro ::-webkit-scrollbar-corner { background: #c0c0c0; }
+
+/* ── STRIP MODERN EFFECTS ── */
 body.retro * {
     text-shadow: none !important;
-    box-shadow: none;
     backdrop-filter: none !important;
     filter: none !important;
 }
 
-
-/* ─────────────────────────────────────────────
-   SCROLLBAR (WINDOWS STYLE)
-   ───────────────────────────────────────────── */
-
-body.retro ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
-}
-
-body.retro ::-webkit-scrollbar-track {
-    background: #c0c0c0;
-}
-
-body.retro ::-webkit-scrollbar-thumb {
-    background: #c0c0c0;
-
-    border-top: 2px solid white;
-    border-left: 2px solid white;
-    border-right: 2px solid #404040;
-    border-bottom: 2px solid #404040;
-}
-
-body.retro ::-webkit-scrollbar-corner {
-    background: #c0c0c0;
+/* re-allow box-shadow only on modal/auth */
+body.retro .modal,
+body.retro .auth-box,
+body.retro .verify-box {
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3) !important;
 }
