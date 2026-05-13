@@ -2,97 +2,118 @@
    WINDOWS 98 / XP CLASSIC RETRO THEME
    ───────────────────────────────────────────── */
 
-/* ── RETRO ROOT ── */
-body.retro {
-    --bg: #008080;
-    --bg-card: #c0c0c0;
-    --border-light: #ffffff;
-    --border-mid: #808080;
-    --border-dark: #404040;
-    --text: #000000;
-    --text-muted: #1a1a1a;
-    --text-dim: #2a2a2a;
-    --green: #008000;
-    --yellow: #808000;
-    --red: #800000;
-    --mono: 'Tahoma', 'MS Sans Serif', sans-serif;
-    --sans: 'Tahoma', 'MS Sans Serif', sans-serif;
 
-    background-color: #008080;
-    color: black;
+/* ── GRID ── */
+
+body.retro .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+/* ─────────────────────────────────────────────
+   TEXT
+   ───────────────────────────────────────────── */
+
+body.retro .ticker-info {
+    gap: 12px;
+}
+
+body.retro .ticker-name {
     font-family: Tahoma, sans-serif;
-    font-size: 13px;
-    image-rendering: pixelated;
+    font-size: 20px;
+    font-weight: bold;
+
+    color: white;
+
+    line-height: 1.1;
 }
 
-/* ── RETRO BACKGROUND — tiled Windows 98 diamond pattern ── */
-body.retro::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
+body.retro .company-name {
+    font-size: 12px;
+    color: #f0f0f0;
 
-    /* Classic Windows teal desktop texture */
-    background-color: #008080;
-    background-image:
-        /* diagonal cross-hatch in a darker teal */
-        repeating-linear-gradient(
-            45deg,
-            rgba(0,0,0,0.06) 0px,
-            rgba(0,0,0,0.06) 1px,
-            transparent 1px,
-            transparent 8px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            rgba(0,0,0,0.06) 0px,
-            rgba(0,0,0,0.06) 1px,
-            transparent 1px,
-            transparent 8px
-        );
-    background-size: 16px 16px;
+    margin-top: 4px;
 
-    /* no animation — static like real Win98 */
-    animation: none;
+    max-width: 240px;
 }
 
-/* remove the scanline animation override */
-body.retro::after { display: none; }
+body.retro .industry-tag {
+    font-size: 11px;
 
-/* ── HEADER ── */
-body.retro header {
+    color: #202020;
+
+    padding: 14px 16px 6px;
+
+    margin: 0;
+
+    font-weight: bold;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* ── THEME TOGGLE BUTTON ── */
+
+body.retro .theme-toggle {
+    position: static;
+    top: auto;
+    right: auto;
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+    padding: 4px 10px;
+
     background: #c0c0c0;
-    font-size: 13px;
-    border-top: 2px solid white;
-    border-left: 2px solid white;
+    color: black;
+
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    cursor: pointer;
+    width: auto;
+    margin-top: 0;
+    margin-bottom: 12px;
     box-shadow: none;
-    backdrop-filter: none;
-}
-
-/* ── LOGO ── */
-body.retro .logo {
-    color: black;
-    font-family: Tahoma, sans-serif;
-    font-weight: bold;
-    font-size: 16px;
-    text-shadow: none;
+    text-transform: none;
     letter-spacing: 0;
+    transition: all 0.1s;
+    z-index: auto;
+    display: inline-block;
 }
 
-/* ── PAGE TITLE ── */
-body.retro .page-title {
-    color: white;
-    font-weight: bold;
-    text-shadow: 1px 1px 0 #000;
-    letter-spacing: 1px;
+body.retro .theme-toggle::before {
+    display: none;
 }
 
-body.retro .page-title::before { content: ''; }
+body.retro .theme-toggle:hover {
+    background: #d6d6d6;
+    box-shadow: none;
+    transform: none;
+}
+
+body.retro .theme-toggle:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: none;
+    transform: none;
+}
+
+body.retro .card:active {
+    border-top: 3px solid #404040;
+    border-left: 3px solid #404040;
+    border-right: 3px solid #ffffff;
+    border-bottom: 3px solid #ffffff;
+}
+
 
 /* ── SORT BUTTONS ── */
+
 body.retro .sort-btn {
     font-family: Tahoma, sans-serif;
     font-size: 11px;
@@ -106,10 +127,12 @@ body.retro .sort-btn {
     border-radius: 0;
     cursor: pointer;
     letter-spacing: 0;
-    transition: none;
+    transition: all 0.1s;
 }
 
-body.retro .sort-btn:hover { background: #d6d6d6; }
+body.retro .sort-btn:hover {
+    background: #d6d6d6;
+}
 
 body.retro .sort-btn.active {
     background: #000080;
@@ -121,148 +144,234 @@ body.retro .sort-btn.active {
     font-weight: bold;
 }
 
-/* ── THEME TOGGLE ── */
-body.retro .theme-toggle {
-    font-family: Tahoma, sans-serif;
-    font-size: 11px;
-    padding: 4px 12px;
-    background: #c0c0c0;
+/* ─────────────────────────────────────────────
+   RETRO ROOT
+   ───────────────────────────────────────────── */
+
+body.retro {
+    --bg: #008080;
+    --bg-card: #c0c0c0;
+
+    --border-light: #ffffff;
+    --border-mid: #808080;
+    --border-dark: #404040;
+
+    --text: #000000;
+    --text-muted: #202020;
+    --text-dim: #505050;
+
+    --green: #008000;
+    --yellow: #808000;
+    --red: #800000;
+
+    --mono: 'Tahoma', 'MS Sans Serif', sans-serif;
+    --sans: 'Tahoma', 'MS Sans Serif', sans-serif;
+
+    background: #008080;
     color: black;
-    border-top: 2px solid #ffffff;
-    border-left: 2px solid #ffffff;
-    border-right: 2px solid #404040;
-    border-bottom: 2px solid #404040;
-    border-radius: 0;
-    cursor: pointer;
-    box-shadow: none;
-    text-transform: none;
-    letter-spacing: 0;
-    transition: none;
-    display: inline-block;
-    margin-bottom: 0;
+
+    font-family: Tahoma, sans-serif;
+
+    image-rendering: pixelated;
 }
 
-body.retro .theme-toggle::before { display: none; }
-body.retro .theme-toggle:hover { background: #d6d6d6; box-shadow: none; transform: none; }
-body.retro .theme-toggle:active {
-    border-top: 2px solid #404040;
-    border-left: 2px solid #404040;
-    border-right: 2px solid #ffffff;
-    border-bottom: 2px solid #ffffff;
-    transform: none;
+/* Remove futuristic effects */
+
+body.retro::before,
+body.retro::after {
+    display: none;
 }
 
-/* ── CARD — Windows window chrome ── */
-body.retro .card {
+
+/* ─────────────────────────────────────────────
+   HEADER
+   ───────────────────────────────────────────── */
+
+body.retro header {
     background: #c0c0c0;
+    font-size: 13px;
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
-    border-radius: 0;
+
     box-shadow: none;
-    overflow: hidden;
+}
+
+
+/* ─────────────────────────────────────────────
+   LOGO
+   ───────────────────────────────────────────── */
+
+body.retro .company-logo {
+    width: 42px;
+    height: 42px;
+
+    background: white;
+
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+
+    border-radius: 0;
+
+    padding: 2px;
+
+    object-fit: contain;
+}
+
+/* ─────────────────────────────────────────────
+   PAGE TITLE
+   ───────────────────────────────────────────── */
+
+body.retro .page-title {
+    color: white;
+
+    font-weight: bold;
+
+    text-shadow:
+        1px 1px 0 #000;
+
+    letter-spacing: 1px;
+}
+
+body.retro .page-title::before {
+    content: '';
+}
+
+
+/* ─────────────────────────────────────────────
+   WINDOWS STYLE CARD
+   ───────────────────────────────────────────── */
+
+body.retro .card {
+    background: #c0c0c0;
+
+    border-top: 3px solid #ffffff;
+    border-left: 3px solid #ffffff;
+    border-right: 3px solid #404040;
+    border-bottom: 3px solid #404040;
+
+    border-radius: 0;
+
     padding: 0;
-    transform: none !important;
+
+    overflow: hidden;
+
+    min-height: 340px;
+
+    position: relative;
+
+    transition: none;
+
+    image-rendering: pixelated;
 }
 
 body.retro .card:hover {
-    box-shadow: none;
-    transform: none !important;
+    transform: none;
+    background: #c0c0c0;
 }
 
-body.retro .card::before { display: none; }
+/* ── RETRO THEME BUTTON POSITIONING ── */
 
-/* ── CARD TITLE BAR ── */
+body.retro header .theme-toggle {
+    position: static;
+    margin: 0;
+    margin-left: 20px;
+}
+
+body.retro .verify-page .theme-toggle {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* ─────────────────────────────────────────────
+   CARD TITLE BAR
+   ───────────────────────────────────────────── */
+
 body.retro .card-header {
-    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+    background:
+        linear-gradient(
+            90deg,
+            #000080 0%,
+            #0054e3 55%,
+            #1084d0 100%
+        );
+
     color: white;
-    padding: 5px 8px;
+
+    padding: 10px 12px;
+
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     border-bottom: 2px solid #808080;
-    font-size: 12px;
-    font-weight: bold;
+
     margin: 0;
 }
 
-body.retro .card-header .ticker-name {
-    color: white;
-    text-shadow: none;
-    font-size: 16px;
-}
 
-body.retro .card-header .company-name {
-    color: #c8d8f0;
-    max-width: 160px;
-    font-size: 11px;
-}
+/* ─────────────────────────────────────────────
+   CARD CONTENT
+   ───────────────────────────────────────────── */
 
-/* ── CARD BODY — padding wrapper since card padding=0 ── */
-body.retro .industry-tag,
+body.retro .card-content,
+body.retro .factors,
 body.retro .signal-row,
 body.retro .confidence-row,
-body.retro .factors,
+
 body.retro .card-footer {
-    margin-left: 10px;
-    margin-right: 10px;
-}
+    margin-top: auto;
 
-body.retro .industry-tag {
-    /* lighter inset area colour so text is readable */
-    background: #d4d0c8;
-    color: #000080;
-    font-weight: bold;
+    padding-top: 14px;
+    padding-bottom: 14px;
+
+    border-top: 2px solid #808080;
+
     font-size: 11px;
-    letter-spacing: 0.5px;
-    padding: 4px 8px;
-    margin: 0;
-    border-bottom: 1px solid #808080;
+
+    color: #202020;
+
+    font-weight: bold;
+
+    background: #b4b4b4;
 }
 
-body.retro .signal-row  { margin-top: 10px; }
-body.retro .factors     { margin-top: 4px; }
-body.retro .card-footer { margin-bottom: 8px; }
 
-/* ── CONFIDENCE BAR WRAP ── */
-body.retro .confidence-row {
-    margin-top: 8px;
-}
 
-body.retro .confidence-bar-wrap {
-    background: #808080;
-    height: 4px;
-    border-top: 1px solid #404040;
-    border-left: 1px solid #404040;
-    border-right: 1px solid white;
-    border-bottom: 1px solid white;
-    border-radius: 0;
-}
+/* ─────────────────────────────────────────────
+   BUTTONS
+   ───────────────────────────────────────────── */
 
-body.retro .confidence-bar.buy   { background: #00aa00; }
-body.retro .confidence-bar.hold  { background: #cccc00; }
-body.retro .confidence-bar.sell,
-body.retro .confidence-bar.short { background: #aa0000; }
-
-/* ── BUTTONS ── */
 body.retro button,
 body.retro .auth-btn,
 body.retro .logout-btn {
     background: #c0c0c0;
     color: black;
+
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
+
     border-radius: 0;
     box-shadow: none;
+
     font-family: Tahoma, sans-serif;
-    font-size: 12px;
+    font-size: 11px;
+
     cursor: pointer;
-    transform: none !important;
 }
 
 body.retro button:hover,
 body.retro .auth-btn:hover,
-body.retro .logout-btn:hover { background: #d6d6d6; }
+body.retro .logout-btn:hover {
+    background: #d6d6d6;
+}
 
 body.retro button:active,
 body.retro .auth-btn:active,
@@ -273,156 +382,285 @@ body.retro .logout-btn:active {
     border-bottom: 2px solid white;
 }
 
-/* ── INPUTS ── */
+
+/* ─────────────────────────────────────────────
+   INPUTS
+   ───────────────────────────────────────────── */
+
 body.retro input,
 body.retro textarea,
 body.retro select {
     background: white;
     color: black;
+
     border-top: 2px solid #404040;
     border-left: 2px solid #404040;
     border-right: 2px solid white;
     border-bottom: 2px solid white;
+
     border-radius: 0;
+
     font-family: Tahoma, sans-serif;
-    font-size: 12px;
+    font-size: 11px;
+
     box-shadow: none;
 }
 
 body.retro input:focus,
-body.retro textarea:focus {
+body.retro textarea:focus,
+body.retro select:focus {
     outline: 1px dotted black;
     outline-offset: -4px;
-    border-color: inherit;
 }
 
-/* ── SIGNALS ── */
+
+/* ─────────────────────────────────────────────
+   SIGNAL TAGS
+   ───────────────────────────────────────────── */
+
+body.retro .signal-row {
+    gap: 8px;
+
+    margin-top: 12px;
+    margin-bottom: 16px;
+
+    flex-wrap: wrap;
+}
+
 body.retro .signal {
     background: #d4d0c8;
-    border-top: 1px solid white;
-    border-left: 1px solid white;
-    border-right: 1px solid #404040;
-    border-bottom: 1px solid #404040;
-    color: black;
-    font-size: 11px;
-    font-family: Tahoma, sans-serif;
-    border-radius: 0;
-}
 
-/* ── VERDICT BADGES ── */
-body.retro .verdict {
-    font-weight: bold;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 3px 8px;
-    font-size: 11px;
-}
-
-body.retro .verdict-buy   { background: #006600; color: white; border: none; }
-body.retro .verdict-hold  { background: #cccc00; color: black; border: none; }
-body.retro .verdict-sell,
-body.retro .verdict-short { background: #aa0000; color: white; border: none; }
-
-/* ── FACTORS ── */
-body.retro .factors li {
-    font-size: 12px;
-    color: #1a1a1a;
-}
-
-body.retro .factors li::before {
-    content: '■';
-    color: #000080;
-    font-size: 8px;
-    margin-top: 3px;
-}
-
-/* ── CARD FOOTER ── */
-body.retro .card-footer {
-    border-top: 1px solid #808080;
-    color: #404040;
-    font-size: 10px;
-    font-family: Tahoma, sans-serif;
-}
-
-/* ── ANALYST BARS ── */
-body.retro .bar-strong-buy,
-body.retro .bar-buy         { background: #00aa00; box-shadow: none; }
-body.retro .bar-hold        { background: #cccc00; box-shadow: none; }
-body.retro .bar-sell,
-body.retro .bar-strong-sell { background: #aa0000; box-shadow: none; }
-
-body.retro .bar-label { color: #404040; font-family: Tahoma, sans-serif; }
-body.retro .bar-value { color: #000000; font-family: Tahoma, sans-serif; }
-
-/* ── MODAL ── */
-body.retro .modal-overlay {
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: none;
-}
-
-body.retro .modal {
-    background: #c0c0c0;
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
+
     border-radius: 0;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+
+    color: black;
+
+    font-size: 11px;
+    font-family: Tahoma, sans-serif;
+
+    padding: 5px 10px;
+
+    min-height: 28px;
+
+    display: flex;
+    align-items: center;
+}
+
+
+
+/* ─────────────────────────────────────────────
+   VERDICT BADGES
+   ───────────────────────────────────────────── */
+
+body.retro .verdict {
+    font-family: Tahoma, sans-serif;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    padding: 5px 12px;
+
+    border-radius: 0;
+
+    border-top: 2px solid rgba(255,255,255,0.6);
+    border-left: 2px solid rgba(255,255,255,0.6);
+    border-right: 2px solid rgba(0,0,0,0.4);
+    border-bottom: 2px solid rgba(0,0,0,0.4);
+
+    letter-spacing: 0;
+}
+
+body.retro .verdict-buy {
+    background: #00aa00;
+    color: white;
+}
+
+body.retro .verdict-hold {
+    background: #d4c400;
+    color: black;
+}
+
+body.retro .verdict-sell,
+body.retro .verdict-short {
+    background: #aa0000;
+    color: white;
+}
+
+/* ─────────────────────────────────────────────
+   CONFIDENCE BARS
+   ───────────────────────────────────────────── */
+
+body.retro .confidence-bar.buy {
+    background: #00aa00;
+}
+
+body.retro .confidence-bar.hold {
+    background: #cccc00;
+}
+
+body.retro .confidence-bar.sell,
+body.retro .confidence-bar.short {
+    background: #aa0000;
+}
+
+
+body.retro .confidence-row {
+    margin-bottom: 18px;
+
+    gap: 10px;
+}
+
+body.retro .confidence-label {
+    font-size: 11px;
+    font-weight: bold;
+
+    color: black;
+}
+
+body.retro .confidence-bar-wrap {
+    height: 12px;
+
+    background: #808080;
+
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+
+    border-radius: 0;
+
+    overflow: hidden;
+}
+
+body.retro .confidence-bar {
+    height: 100%;
+    border-radius: 0;
+}
+
+/* ─────────────────────────────────────────────
+   FACTORS LIST
+   ───────────────────────────────────────────── */
+
+body.retro .factors {
+    padding-bottom: 12px;
+}
+
+body.retro .factors li {
+    font-size: 13px;
+
+    color: black;
+
+    line-height: 1.6;
+
+    padding: 5px 0;
+
+    gap: 8px;
+}
+
+body.retro .factors li::before {
+    content: '■';
+
+    font-size: 10px;
+
+    margin-top: 4px;
+
+    color: black;
+}
+
+
+
+
+/* ─────────────────────────────────────────────
+   ANALYST BARS
+   ───────────────────────────────────────────── */
+
+body.retro .bar-strong-buy,
+body.retro .bar-buy {
+    background: #00aa00;
+    box-shadow: none;
+}
+
+body.retro .bar-hold {
+    background: #cccc00;
+    box-shadow: none;
+}
+
+body.retro .bar-sell,
+body.retro .bar-strong-sell {
+    background: #aa0000;
+    box-shadow: none;
+}
+
+
+/* ─────────────────────────────────────────────
+   MODAL
+   ───────────────────────────────────────────── */
+
+body.retro .modal {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+
+    border-radius: 0;
+    box-shadow: none;
+
+    overflow: hidden;
 }
 
 body.retro .modal-header {
-    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
-    color: white;
-    padding: 8px 12px;
-    margin-bottom: 16px;
-    border-bottom: 2px solid #808080;
-    border-radius: 0;
-    font-weight: bold;
-    font-family: Tahoma, sans-serif;
-}
+    background: linear-gradient(
+        90deg,
+        #000080 0%,
+        #1084d0 100%
+    );
 
-body.retro .modal-body {
-    padding: 0 16px 16px;
+    color: white;
+
+    padding: 8px 10px;
+
+    border-bottom: 2px solid #808080;
+
+    border-radius: 0;
+
+    font-weight: bold;
 }
 
 body.retro .modal-summary {
     font-size: 12px;
     color: black;
-    background: white;
-    border: inset 2px;
-    border-top: 2px solid #404040;
-    border-left: 2px solid #404040;
-    border-right: 2px solid white;
-    border-bottom: 2px solid white;
-    border-radius: 0;
-    padding: 10px;
-    line-height: 1.6;
 }
 
-body.retro .analyst-chart h4 {
-    color: #000080;
-    font-family: Tahoma, sans-serif;
-    font-weight: bold;
-    letter-spacing: 0;
-}
 
-/* ── MODAL CLOSE ── */
+/* ─────────────────────────────────────────────
+   CLOSE BUTTON
+   ───────────────────────────────────────────── */
+
 body.retro .modal-close {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+
     background: #c0c0c0;
     color: black;
+
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
+
     border-radius: 0;
+
     font-size: 11px;
     font-weight: bold;
+
     box-shadow: none;
 }
-
-body.retro .modal-close:hover { border-color: inherit; color: black; background: #d6d6d6; }
 
 body.retro .modal-close:active {
     border-top: 2px solid #404040;
@@ -431,86 +669,92 @@ body.retro .modal-close:active {
     border-bottom: 2px solid white;
 }
 
-/* ── AUTH BOX ── */
-body.retro .auth-page {
-    background: transparent;
-}
+
+/* ─────────────────────────────────────────────
+   AUTH BOX
+   ───────────────────────────────────────────── */
 
 body.retro .auth-box {
     background: #c0c0c0;
+
     border-top: 2px solid white;
     border-left: 2px solid white;
     border-right: 2px solid #404040;
     border-bottom: 2px solid #404040;
+
     border-radius: 0;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
-    width: 280px;
+    box-shadow: none;
 }
 
 body.retro .auth-logo {
-    color: white;
-    text-shadow: 1px 1px 0 #000, 2px 2px 0 #004040;
-    font-family: Tahoma, sans-serif;
-    font-size: 28px;
-}
-
-body.retro .auth-tagline {
-    color: #d0f0f0;
-    text-shadow: 1px 1px 0 #004040;
-    font-family: Tahoma, sans-serif;
-}
-
-body.retro .auth-disclaimer {
-    color: #c0e0e0;
-    text-shadow: 1px 1px 0 #004040;
-}
-
-body.retro .auth-box h2 {
     color: black;
+
+    text-shadow: none;
+
     font-family: Tahoma, sans-serif;
-    letter-spacing: 0;
-    font-size: 12px;
+    font-weight: bold;
 }
 
-body.retro .auth-box p { color: #404040; }
-body.retro .auth-box p a { color: #000080; }
 
-/* ── VERIFY BOX ── */
-body.retro .verify-box {
-    background: #c0c0c0;
-    border-top: 2px solid white;
-    border-left: 2px solid white;
-    border-right: 2px solid #404040;
-    border-bottom: 2px solid #404040;
-    border-radius: 0;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
-}
+/* ─────────────────────────────────────────────
+   REMOVE ALL MODERN EFFECTS
+   ───────────────────────────────────────────── */
 
-body.retro .verify-box h2 { font-family: Tahoma, sans-serif; color: black; }
-body.retro .verify-box p  { color: #404040; }
-
-/* ── SCROLLBAR ── */
-body.retro ::-webkit-scrollbar { width: 16px; height: 16px; }
-body.retro ::-webkit-scrollbar-track { background: #c0c0c0; }
-body.retro ::-webkit-scrollbar-thumb {
-    background: #c0c0c0;
-    border-top: 2px solid white;
-    border-left: 2px solid white;
-    border-right: 2px solid #404040;
-    border-bottom: 2px solid #404040;
-}
-body.retro ::-webkit-scrollbar-corner { background: #c0c0c0; }
-
-/* ── STRIP MODERN EFFECTS ── */
 body.retro * {
     text-shadow: none !important;
+    box-shadow: none;
     backdrop-filter: none !important;
     filter: none !important;
 }
 
-/* re-allow box-shadow only on modal/auth */
-body.retro .modal,
-body.retro .auth-box,
-body.retro .verify-box {
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.3) !important;
+
+/* ─────────────────────────────────────────────
+   SCROLLBAR (WINDOWS STYLE)
+   ───────────────────────────────────────────── */
+
+body.retro ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+body.retro ::-webkit-scrollbar-track {
+    background: #c0c0c0;
+}
+
+body.retro ::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+
+    border-top: 2px solid white;
+    border-left: 2px solid white;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+}
+
+body.retro ::-webkit-scrollbar-corner {
+    background: #c0c0c0;
+}
+
+
+/* ─────────────────────────────────────────────
+   REMOVE ALL MODERN EFFECTS
+   ───────────────────────────────────────────── */
+
+body.retro .card::before,
+body.retro .card::after,
+body.retro .modal::before,
+body.retro .modal::after {
+    display: none !important;
+}
+
+
+
+body.retro * {
+    text-shadow: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    animation: none !important;
+    transition:
+        background 0.05s linear,
+        border 0.05s linear !important;
 }
