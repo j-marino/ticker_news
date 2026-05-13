@@ -56,7 +56,7 @@ class UserInDB(User, table=True):
 
 class UnverifiedUser(User, table=True):
     hashed_password: str
-    creation_time: datetime.datetime 
+    creation_time: datetime
     generated_code: int
 
 
