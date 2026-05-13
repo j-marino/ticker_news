@@ -50,8 +50,8 @@ def get_technicals(ticker):
         "golden_cross": bool(latest['SMA50'] > latest['SMA200']),
         "bb_position": round(latest['BB_position'], 2),  # 0=bottom of band, 1=top
         "bb_signal": "overbought" if latest['BB_position'] > 0.8 else "oversold" if latest['BB_position'] < 0.2 else "neutral",
-        "forwardPE": stock['forwardPE'],
-        "trailingPE": stock['trailingPE']
+        "forwardPE": stock.info['forwardPE'],
+        "trailingPE": stock.info['trailingPE']
     }
 
 
