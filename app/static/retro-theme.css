@@ -758,16 +758,3 @@ body.retro * {
         background 0.05s linear,
         border 0.05s linear !important;
 }
-
-.confidence-title {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
-  color: #ff9d00;
-
-  text-shadow:
-    0 0 4px rgba(255,157,0,0.7),
-    0 0 10px rgba(255,157,0,0.25);
-}

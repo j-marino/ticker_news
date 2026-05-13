@@ -32,7 +32,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 class Token(BaseModel):
     access_token: str
@@ -56,7 +56,7 @@ class UserInDB(User, table=True):
 
 class UnverifiedUser(User, table=True):
     hashed_password: str
-    creation_time: str 
+    creation_time: datetime.datetime 
     generated_code: int
 
 
@@ -103,6 +103,19 @@ async def run_depopulate():
     await asyncio.to_thread(depopulate)
 
 
+async def delete_unverified_user():
+    with Session(engine) as session:
+        cutoff = datetime.now() - timedelta(minutes=10)
+        users = session.exec(select(UnverifiedUser).where(UnverifiedUser.creation_time < cutoff)).all()
+        for user in users:
+            session.delete(user)
+        session.commit()
+
+
+async def run_delete_unverified_user():
+    await asyncio.to_thread(delete_unverified_user)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
@@ -115,6 +128,8 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(run_depopulate, CronTrigger(hour=6, minute=45, day_of_week='mon-fri'))
     # weekdays 7am UTC
     scheduler.add_job(run_populate, CronTrigger(hour=7, minute=0, day_of_week='mon-fri'))
+    # delete unverified users every minute
+    scheduler.add_job(run_delete_unverified_user, CronTrigger(minute='*'))
     
     scheduler.start()
     yield
@@ -381,7 +396,7 @@ async def create_user(
         username=username,
         email=email,
         hashed_password=get_password_hash(password),
-        creation_time=datetime.now().strftime("%X"), # local time version e.g. '17:41:00'
+        creation_time=datetime.now(), 
         generated_code=generated_code
     )
 
@@ -418,6 +433,7 @@ async def email_verify(
     inputted_code: int = Form(...)
 ):
     username = request.cookies.get("pending_username")
+    # will not work if the cookie expires.
     if not username:
         return RedirectResponse(url="/")
 
