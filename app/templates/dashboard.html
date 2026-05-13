@@ -63,7 +63,7 @@
 
             {% if vd.confidence %}
             <div class="confidence-row">
-                <span class="confidence-label">confidence:{{ (vd.confidence * 100) | int }}%</span>
+                <span class="confidence-label"><b>confidence: {{ (vd.confidence * 100) | int }}%</b></span></span>
                 <div class="confidence-bar-wrap">
                     <div class="confidence-bar {{ vd.verdict }}" style="width: {{ ((vd.confidence * 100) | int) }}%;"></div>
                 </div>
