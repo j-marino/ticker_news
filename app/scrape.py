@@ -21,6 +21,7 @@ requests.get(url, timeout=30)
 
 # Gemini model fallback chain
 GEMINI_MODELS = [
+    'gemini-3.1-flash-lite',
     'gemini-2.5-flash-lite',
     'gemini-2.5-flash',
     'gemini-2.0-flash',
