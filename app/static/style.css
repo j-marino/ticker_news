@@ -142,28 +142,28 @@ main {
 
   border: 1px solid rgba(255,255,255,0.08);
 
-  border-radius: 18px;
+  border-radius: 12px;
 
-  padding: 28px;
+  padding: 24px;
 
-  cursor: pointer;
+cursor: pointer;
   position: relative;
   overflow: hidden;
 
   transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
 
   backdrop-filter: blur(14px);
 
   box-shadow:
-    0 10px 30px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.04);
+    0 10px 30px rgba(0,0,0,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.03);
 }
 
-/* moving glow */
+/* neutral hover lighting */
 .card::before {
   content: '';
 
@@ -174,19 +174,19 @@ main {
 
   opacity: 0;
 
-  transition: opacity 0.25s ease;
+  transition: opacity 0.22s ease;
 
   background:
     radial-gradient(
-      500px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,255,255,0.06),
-      transparent 40%
+      320px circle at var(--mouse-x) var(--mouse-y),
+      rgba(255,255,255,0.055),
+      transparent 45%
     );
 
   z-index: 0;
 }
 
-/* verdict glow layer */
+/* colored cursor glow */
 .card::after {
   content: '';
 
@@ -195,7 +195,9 @@ main {
 
   border-radius: inherit;
 
-  opacity: 0.9;
+  opacity: 0;
+
+  transition: opacity 0.22s ease;
 
   pointer-events: none;
 
@@ -210,18 +212,18 @@ main {
 .card.buy::after {
   background:
     radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      rgba(0,230,118,0.16),
-      transparent 35%
+      240px circle at var(--mouse-x) var(--mouse-y),
+      rgba(0,230,118,0.14),
+      transparent 45%
     );
 }
 
 .card.hold::after {
   background:
     radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,214,0,0.14),
-      transparent 35%
+      240px circle at var(--mouse-x) var(--mouse-y),
+      rgba(255,214,0,0.12),
+      transparent 45%
     );
 }
 
@@ -229,35 +231,38 @@ main {
 .card.short::after {
   background:
     radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,23,68,0.16),
-      transparent 35%
-    ); 
+      240px circle at var(--mouse-x) var(--mouse-y),
+      rgba(255,23,68,0.14),
+      transparent 45%
+    );
 }
 
 .card:hover {
   transform:
-    translateY(-6px)
-    scale(1.015);
+    translateY(-4px)
+    scale(1.01);
 
-  border-color: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.12);
 
   background: var(--bg-card-hover);
 
   box-shadow:
-    0 25px 60px rgba(0,0,0,0.45),
+    0 18px 50px rgba(0,0,0,0.4),
     0 0 0 1px rgba(255,255,255,0.03),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+    inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 
-.card:hover::before { opacity: 1; }
+.card:hover::before,
+.card:hover::after {
+  opacity: 1;
+} 
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   position: relative;
   z-index: 1;
 }
@@ -271,12 +276,18 @@ main {
 .ticker-info { display: flex; align-items: center; gap: 10px; }
 
 .company-logo {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 42px;
+  height: 42px;
+
+  border-radius: 10px;
+
   object-fit: contain;
-  background: #1a1a1a;
-  border: 1px solid var(--border);
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.06);
+
+  padding: 6px;
 }
 
 .ticker-name {
@@ -327,7 +338,7 @@ main {
 .signal-row {
   display: flex;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
   position: relative;
   z-index: 1;
@@ -348,7 +359,7 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   position: relative;
   z-index: 1;
 }
@@ -406,8 +417,8 @@ main {
 }
 
 .card-footer {
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
   font-size: 10px;
   color: var(--text-muted);
@@ -442,7 +453,7 @@ main {
 .modal {
   background: var(--bg-card);
   border: 1px solid var(--border-bright);
-  border-radius: 14px;
+  border-radius: 12px;
   width: 100%;
   max-width: 600px;
   max-height: 88vh;
