@@ -215,20 +215,6 @@ cursor: pointer;
   opacity: 1;
 }
 
-/* REMOVE OLD SECOND GLOW LAYER */
-.card::after {
-  display: none;
-}
-
-.card.sell::after,
-.card.short::after {
-  background:
-    radial-gradient(
-      240px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,23,68,0.14),
-      transparent 45%
-    );
-}
 
 .card:hover {
   transform:
@@ -244,12 +230,6 @@ cursor: pointer;
     0 0 0 1px rgba(255,255,255,0.03),
     inset 0 1px 0 rgba(255,255,255,0.04);
 }
-
-
-.card:hover::before,
-.card:hover::after {
-  opacity: 1;
-} 
 
 .card-header {
   display: flex;
@@ -272,15 +252,14 @@ cursor: pointer;
   width: 42px;
   height: 42px;
 
-  border-radius: 10px;
-
   object-fit: contain;
 
-  background: rgba(255,255,255,0.03);
+  border: none;
+  background: transparent;
 
-  border: 1px solid rgba(255,255,255,0.06);
+  padding: 0;
 
-  padding: 6px;
+  border-radius: 0;
 }
 
 .ticker-name {
