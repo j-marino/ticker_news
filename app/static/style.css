@@ -180,42 +180,6 @@ cursor: pointer;
   z-index: 0;
 }
 
-/* BUY */
-.card.buy::before {
-  background:
-    radial-gradient(
-      240px circle at var(--mouse-x) var(--mouse-y),
-      rgba(0,230,118,0.14),
-      transparent 45%
-    );
-}
-
-/* HOLD */
-.card.hold::before {
-  background:
-    radial-gradient(
-      240px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,214,0,0.12),
-      transparent 45%
-    );
-}
-
-/* SELL / SHORT */
-.card.sell::before,
-.card.short::before {
-  background:
-    radial-gradient(
-      240px circle at var(--mouse-x) var(--mouse-y),
-      rgba(255,23,68,0.14),
-      transparent 45%
-    );
-}
-
-.card:hover::before {
-  opacity: 1;
-}
-
-
 .card:hover {
   transform:
     translateY(-4px)
