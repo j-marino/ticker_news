@@ -27,8 +27,8 @@
     const COLS        = 72;
     const ROWS        = 40;
     const DOT_BASE_R  = 1.0;
-    const WAVE_AMP    = 15;     // subtle (was 26)
-    const WAVE_SPEED  = 0.0004; // slow drift (was 0.0008) both of which were too fast ^^^
+    const WAVE_AMP    = 18;     // subtle (was 26)
+    const WAVE_SPEED  = 0.0005; // slow drift (was 0.0008) both of which were too fast ^^^
     const WAVE_FREQ_X = 0.22;
     const WAVE_FREQ_Z = 0.30;
     const DEPTH_BASE  = 0.3;
