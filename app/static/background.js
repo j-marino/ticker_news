@@ -42,9 +42,14 @@
     function resize () {
       W = canvas.width  = window.innerWidth;
       H = canvas.height = window.innerHeight;
-      colGap = W / (COLS - 1);
-      rowGap = H / (ROWS - 1); // full height coverage
+      // on narrow screens use fewer columns so dots aren't crammed
+      activeCols = W < 480 ? 36 : COLS;
+      activeRows = W < 480 ? 22 : ROWS;
+      colGap = W / (activeCols - 1);
+      rowGap = H / (activeRows - 1);
     }
+
+    let activeCols = COLS, activeRows = ROWS;
 
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -57,10 +62,10 @@
       ctx.clearRect(0, 0, W, H);
       t += WAVE_SPEED;
 
-      for (let row = 0; row < ROWS; row++) {
-        const depth = row / (ROWS - 1);
+      for (let row = 0; row < activeRows; row++) {
+        const depth = row / (activeRows - 1);
 
-        for (let col = 0; col < COLS; col++) {
+        for (let col = 0; col < activeCols; col++) {
           const bx = col * colGap;
           const by = row * rowGap;
 
