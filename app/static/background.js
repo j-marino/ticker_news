@@ -114,12 +114,19 @@
     glow.innerHTML = '<div class="cursor-halo"></div><div class="cursor-core"></div>';
     document.body.appendChild(glow);
 
-    let cx = -200, cy = -200;           // cursor position
-    let targetR = 0, targetG = 230, targetB = 118;   // target colour
-    let curR = 0,   curG = 230, curB = 118;           // current interpolated colour
-    const LERP = 0.06;                  // colour transition speed
+    /* hide native cursor globally */
+    document.body.style.cursor = 'none';
 
+    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    let targetR = 0, targetG = 230, targetB = 118;
+    let curR = 0,   curG = 230,   curB = 118;
+    const LERP = 0.06;
     const root = document.documentElement;
+
+    /* seed root vars immediately so CSS radial-gradient has values */
+    root.style.setProperty('--cursor-r', 0);
+    root.style.setProperty('--cursor-g', 230);
+    root.style.setProperty('--cursor-b', 118);
 
     function setColor (r, g, b) { targetR = r; targetG = g; targetB = b; }
     function applyColor () {
@@ -133,11 +140,29 @@
 
     function lerp (a, b, t) { return a + (b - a) * t; }
 
-    /* track mouse */
+    /* track mouse — always, not just over cards */
     window.addEventListener('mousemove', e => {
       cx = e.clientX;
       cy = e.clientY;
     }, { passive: true });
+
+    /* seed every card's colour vars on boot so first hover is correct */
+    function seedCardColors () {
+      document.querySelectorAll('.card').forEach(card => {
+        const badge = card.querySelector('.verdict');
+        if (!badge) return;
+        let verdict = 'default';
+        badge.classList.forEach(cls => {
+          const m = cls.match(/^verdict-(.+)$/);
+          if (m) verdict = m[1];
+        });
+        const col = VERDICT_COLORS[verdict] || VERDICT_COLORS.default;
+        card.style.setProperty('--cursor-r', col.r);
+        card.style.setProperty('--cursor-g', col.g);
+        card.style.setProperty('--cursor-b', col.b);
+      });
+    }
+    seedCardColors();
 
     /* detect card verdict on hover */
     document.addEventListener('mouseover', e => {
@@ -146,7 +171,6 @@
 
       document.body.classList.add('hovering-card');
 
-      /* find verdict badge inside card */
       const badge = card.querySelector('.verdict');
       if (!badge) return;
 
@@ -158,18 +182,12 @@
 
       const col = VERDICT_COLORS[verdict] || VERDICT_COLORS.default;
       setColor(col.r, col.g, col.b);
-
-      /* also update card's --cursor-r/g/b for inner glow */
-      card.style.setProperty('--cursor-r', col.r);
-      card.style.setProperty('--cursor-g', col.g);
-      card.style.setProperty('--cursor-b', col.b);
     });
 
     document.addEventListener('mouseout', e => {
-      if (!e.target.closest('.card')) return;
       const card = e.target.closest('.card');
-      /* reset only when leaving the card entirely */
-      if (card && !card.contains(e.relatedTarget)) {
+      if (!card) return;
+      if (!card.contains(e.relatedTarget)) {
         document.body.classList.remove('hovering-card');
         setColor(
           VERDICT_COLORS.default.r,
@@ -179,7 +197,7 @@
       }
     });
 
-    /* animation loop for smooth colour lerp + position */
+    /* animation loop — runs always, cursor visible everywhere */
     let rafX = cx, rafY = cy;
     const POS_LERP = 0.18;
 
@@ -195,19 +213,6 @@
     tick();
   }
 
-  /* ─────────────── CARD MOUSE-FOLLOW INNER GLOW ─────────────── */
-  function initCardGlow () {
-    document.addEventListener('mousemove', e => {
-      const card = e.target.closest?.('.card');
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
-      const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
-      card.style.setProperty('--mouse-x', x);
-      card.style.setProperty('--mouse-y', y);
-    }, { passive: true });
-  }
-
   /* ─────────────── BOOT ─────────────── */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
@@ -218,7 +223,6 @@
   function boot () {
     initDotWave();
     initCursor();
-    initCardGlow();
   }
 
 })();
