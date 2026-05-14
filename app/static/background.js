@@ -1,24 +1,19 @@
 /**
  * background.js
- * Drop this script at the bottom of <body> (or import it).
- * It handles:
- *   1. Animated dot-wave canvas background
- *   2. Verdict-aware custom cursor glow
- *
- * Verdict colour map  →  buy: green | hold: yellow | sell/short: red
- * The cursor colour transitions smoothly between verdicts as you hover cards.
+ * 1. Animated dot-wave canvas — full viewport coverage, subtle motion
+ * 2. Verdict-aware ambient glow that follows the mouse (NOT a fake cursor)
+ *    — native cursor is fully preserved
  */
 
 (function () {
   'use strict';
 
-  /* ─────────────── COLOUR MAP ─────────────── */
   const VERDICT_COLORS = {
-    buy:   { r: 0,   g: 230, b: 118 },   // --green
-    hold:  { r: 255, g: 214, b: 0   },   // --yellow
-    sell:  { r: 255, g: 23,  b: 68  },   // --red
-    short: { r: 255, g: 23,  b: 68  },   // --red
-    default: { r: 0, g: 230, b: 118 },   // fallback green
+    buy:     { r: 0,   g: 230, b: 118 },
+    hold:    { r: 255, g: 214, b: 0   },
+    sell:    { r: 255, g: 23,  b: 68  },
+    short:   { r: 255, g: 23,  b: 68  },
+    default: { r: 0,   g: 230, b: 118 },
   };
 
   /* ─────────────── DOT WAVE CANVAS ─────────────── */
@@ -29,72 +24,64 @@
 
     const ctx = canvas.getContext('2d');
 
-    /* grid config */
-    const COLS       = 80;   // dots per row
-    const ROWS       = 32;   // rows
-    const DOT_BASE_R = 1.1;  // base dot radius px
-    const WAVE_AMP   = 26;   // vertical wave amplitude px
-    const WAVE_SPEED = 0.0008;
-    const WAVE_FREQ_X = 0.35;
-    const WAVE_FREQ_Z = 0.55; // secondary wave
-    const DEPTH_SCALE = 0.55; // perspective-ish scale at back vs front
+    const COLS        = 72;
+    const ROWS        = 40;
+    const DOT_BASE_R  = 1.0;
+    const WAVE_AMP    = 12;     // subtle (was 26)
+    const WAVE_SPEED  = 0.0003; // slow drift (was 0.0008)
+    const WAVE_FREQ_X = 0.22;
+    const WAVE_FREQ_Z = 0.30;
+    const DEPTH_BASE  = 0.3;
 
-    let W, H, colGap, rowGap, offsetX, offsetY;
+    const RIPPLE_RADIUS = 80;
+    const RIPPLE_LIFT   = 2.5;
+    const RIPPLE_ALPHA  = 0.15;
+
+    let W, H, colGap, rowGap;
 
     function resize () {
       W = canvas.width  = window.innerWidth;
       H = canvas.height = window.innerHeight;
-      colGap  = W / (COLS - 1);
-      rowGap  = H * 0.55 / (ROWS - 1);
-      offsetX = 0;
-      offsetY = H * 0.22;   // vertical centre of wave field
+      colGap = W / (COLS - 1);
+      rowGap = H / (ROWS - 1); // full height coverage
     }
 
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
     let t = 0;
-
-    /* mouse influence — subtle ripple toward cursor */
     let mx = W / 2, my = H / 2;
     window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
 
     function draw () {
       ctx.clearRect(0, 0, W, H);
-
       t += WAVE_SPEED;
 
       for (let row = 0; row < ROWS; row++) {
-        /* depth: 0 = back, 1 = front */
         const depth = row / (ROWS - 1);
-        const scale = DEPTH_BASE + (1 - DEPTH_BASE) * depth;   // size perspective
 
         for (let col = 0; col < COLS; col++) {
           const bx = col * colGap;
-          const by = offsetY + row * rowGap;
+          const by = row * rowGap;
 
-          /* wave height — two overlapping sine waves */
           const waveY =
-            Math.sin(col * WAVE_FREQ_X * 0.18 + t * 7 + row * 0.25)  * WAVE_AMP * (1 - depth * 0.3) +
-            Math.sin(col * WAVE_FREQ_Z * 0.14 - t * 5 + row * 0.18)  * WAVE_AMP * 0.45 * (1 - depth * 0.2);
+            Math.sin(col * WAVE_FREQ_X * 0.18 + t * 5 + row * 0.2) * WAVE_AMP * (0.6 + depth * 0.4) +
+            Math.sin(col * WAVE_FREQ_Z * 0.13 - t * 3.5 + row * 0.15) * WAVE_AMP * 0.35;
 
           const x = bx;
           const y = by + waveY;
 
-          /* mouse proximity ripple */
           const dx = x - mx, dy = y - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const ripple = dist < 120 ? Math.sin((1 - dist / 120) * Math.PI) * 6 : 0;
+          const proximity = dist < RIPPLE_RADIUS ? (1 - dist / RIPPLE_RADIUS) : 0;
+          const ripple = proximity > 0 ? Math.sin(proximity * Math.PI) * RIPPLE_LIFT : 0;
 
-          /* dot size: smaller at back, bigger at front, ripple boost */
-          const r = DOT_BASE_R * (DEPTH_SCALE + (1 - DEPTH_SCALE) * depth) + ripple * 0.6;
-
-          /* dot opacity: fade at back */
-          const alpha = 0.18 + depth * 0.55 + (dist < 120 ? (1 - dist / 120) * 0.35 : 0);
+          const r = DOT_BASE_R * (DEPTH_BASE + (1 - DEPTH_BASE) * depth) + ripple * 0.4;
+          const alpha = 0.1 + depth * 0.45 + proximity * RIPPLE_ALPHA;
 
           ctx.beginPath();
           ctx.arc(x, y + ripple, Math.max(r, 0.3), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,255,${Math.min(alpha, 1)})`;
+          ctx.fillStyle = `rgba(255,255,255,${Math.min(alpha, 0.75)})`;
           ctx.fill();
         }
       }
@@ -102,111 +89,102 @@
       requestAnimationFrame(draw);
     }
 
-    const DEPTH_BASE = 0.3;
     draw();
   }
 
-  /* ─────────────── CUSTOM CURSOR ─────────────── */
-  function initCursor () {
-    /* build DOM */
-    const glow = document.createElement('div');
-    glow.id = 'cursor-glow';
-    glow.innerHTML = '<div class="cursor-halo"></div><div class="cursor-core"></div>';
-    document.body.appendChild(glow);
+  /* ─────────────── AMBIENT VERDICT GLOW ─────────────── */
+  function initAmbientGlow () {
+    const blob = document.createElement('div');
+    blob.id = 'verdict-ambient';
+    Object.assign(blob.style, {
+      position:      'fixed',
+      pointerEvents: 'none',
+      zIndex:        '0',
+      width:         '320px',
+      height:        '320px',
+      borderRadius:  '50%',
+      transform:     'translate(-50%, -50%)',
+      mixBlendMode:  'screen',
+      opacity:       '0',
+      transition:    'opacity 0.4s ease',
+    });
+    document.body.appendChild(blob);
 
-    /* hide native cursor globally */
-    document.body.style.cursor = 'none';
-
-    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    let cx = -999, cy = -999;
+    let bx = cx,   by = cy;
     let targetR = 0, targetG = 230, targetB = 118;
     let curR = 0,   curG = 230,   curB = 118;
-    const LERP = 0.06;
-    const root = document.documentElement;
-
-    /* seed root vars immediately so CSS radial-gradient has values */
-    root.style.setProperty('--cursor-r', 0);
-    root.style.setProperty('--cursor-g', 230);
-    root.style.setProperty('--cursor-b', 118);
-
-    function setColor (r, g, b) { targetR = r; targetG = g; targetB = b; }
-    function applyColor () {
-      curR = lerp(curR, targetR, LERP);
-      curG = lerp(curG, targetG, LERP);
-      curB = lerp(curB, targetB, LERP);
-      root.style.setProperty('--cursor-r', Math.round(curR));
-      root.style.setProperty('--cursor-g', Math.round(curG));
-      root.style.setProperty('--cursor-b', Math.round(curB));
-    }
+    let visible = false;
 
     function lerp (a, b, t) { return a + (b - a) * t; }
 
-    /* track mouse — always, not just over cards */
     window.addEventListener('mousemove', e => {
-      cx = e.clientX;
-      cy = e.clientY;
+      cx = e.clientX; cy = e.clientY;
+      if (!visible) { blob.style.opacity = '1'; visible = true; }
     }, { passive: true });
 
-    /* seed every card's colour vars on boot so first hover is correct */
-    function seedCardColors () {
-      document.querySelectorAll('.card').forEach(card => {
-        const badge = card.querySelector('.verdict');
-        if (!badge) return;
-        let verdict = 'default';
-        badge.classList.forEach(cls => {
-          const m = cls.match(/^verdict-(.+)$/);
-          if (m) verdict = m[1];
-        });
-        const col = VERDICT_COLORS[verdict] || VERDICT_COLORS.default;
-        card.style.setProperty('--cursor-r', col.r);
-        card.style.setProperty('--cursor-g', col.g);
-        card.style.setProperty('--cursor-b', col.b);
-      });
-    }
-    seedCardColors();
-
-    /* detect card verdict on hover */
     document.addEventListener('mouseover', e => {
       const card = e.target.closest('.card');
       if (!card) return;
-
-      document.body.classList.add('hovering-card');
-
       const badge = card.querySelector('.verdict');
       if (!badge) return;
-
       let verdict = 'default';
       badge.classList.forEach(cls => {
         const m = cls.match(/^verdict-(.+)$/);
         if (m) verdict = m[1];
       });
-
       const col = VERDICT_COLORS[verdict] || VERDICT_COLORS.default;
-      setColor(col.r, col.g, col.b);
+      targetR = col.r; targetG = col.g; targetB = col.b;
+      card.style.setProperty('--cursor-r', col.r);
+      card.style.setProperty('--cursor-g', col.g);
+      card.style.setProperty('--cursor-b', col.b);
     });
 
     document.addEventListener('mouseout', e => {
       const card = e.target.closest('.card');
-      if (!card) return;
-      if (!card.contains(e.relatedTarget)) {
-        document.body.classList.remove('hovering-card');
-        setColor(
-          VERDICT_COLORS.default.r,
-          VERDICT_COLORS.default.g,
-          VERDICT_COLORS.default.b
-        );
-      }
+      if (!card || card.contains(e.relatedTarget)) return;
+      targetR = VERDICT_COLORS.default.r;
+      targetG = VERDICT_COLORS.default.g;
+      targetB = VERDICT_COLORS.default.b;
     });
 
-    /* animation loop — runs always, cursor visible everywhere */
-    let rafX = cx, rafY = cy;
-    const POS_LERP = 0.18;
+    // seed card colour vars on boot
+    document.querySelectorAll('.card').forEach(card => {
+      const badge = card.querySelector('.verdict');
+      if (!badge) return;
+      let verdict = 'default';
+      badge.classList.forEach(cls => {
+        const m = cls.match(/^verdict-(.+)$/);
+        if (m) verdict = m[1];
+      });
+      const col = VERDICT_COLORS[verdict] || VERDICT_COLORS.default;
+      card.style.setProperty('--cursor-r', col.r);
+      card.style.setProperty('--cursor-g', col.g);
+      card.style.setProperty('--cursor-b', col.b);
+    });
+
+    const POS_LERP   = 0.08;
+    const COLOR_LERP = 0.04;
 
     function tick () {
-      rafX = lerp(rafX, cx, POS_LERP);
-      rafY = lerp(rafY, cy, POS_LERP);
-      glow.style.left = rafX + 'px';
-      glow.style.top  = rafY + 'px';
-      applyColor();
+      bx = lerp(bx, cx, POS_LERP);
+      by = lerp(by, cy, POS_LERP);
+      blob.style.left = bx + 'px';
+      blob.style.top  = by + 'px';
+
+      curR = lerp(curR, targetR, COLOR_LERP);
+      curG = lerp(curG, targetG, COLOR_LERP);
+      curB = lerp(curB, targetB, COLOR_LERP);
+
+      const r = Math.round(curR), g = Math.round(curG), b = Math.round(curB);
+      blob.style.background =
+        `radial-gradient(circle, rgba(${r},${g},${b},0.09) 0%, transparent 70%)`;
+
+      const root = document.documentElement;
+      root.style.setProperty('--cursor-r', r);
+      root.style.setProperty('--cursor-g', g);
+      root.style.setProperty('--cursor-b', b);
+
       requestAnimationFrame(tick);
     }
 
@@ -214,15 +192,15 @@
   }
 
   /* ─────────────── BOOT ─────────────── */
+  function boot () {
+    initDotWave();
+    initAmbientGlow();
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {
     boot();
-  }
-
-  function boot () {
-    initDotWave();
-    initCursor();
   }
 
 })();

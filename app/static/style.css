@@ -34,7 +34,6 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
-  cursor: none; /* hide default cursor — custom one rendered by JS */
 }
 
 /* ── DOT-WAVE CANVAS ── */
