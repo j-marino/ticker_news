@@ -13,7 +13,7 @@
     hold:    { r: 255, g: 214, b: 0   },
     sell:    { r: 255, g: 23,  b: 68  },
     short:   { r: 255, g: 23,  b: 68  },
-    default: { r: 0,   g: 230, b: 118 },
+    default: { r: 255, g: 255, b: 255 },
   };
 
   /* ─────────────── DOT WAVE CANVAS ─────────────── */
@@ -27,8 +27,8 @@
     const COLS        = 72;
     const ROWS        = 40;
     const DOT_BASE_R  = 1.0;
-    const WAVE_AMP    = 12;     // subtle (was 26)
-    const WAVE_SPEED  = 0.0003; // slow drift (was 0.0008)
+    const WAVE_AMP    = 15;     // subtle (was 26)
+    const WAVE_SPEED  = 0.0004; // slow drift (was 0.0008) both of which were too fast ^^^
     const WAVE_FREQ_X = 0.22;
     const WAVE_FREQ_Z = 0.30;
     const DEPTH_BASE  = 0.3;
@@ -112,8 +112,8 @@
 
     let cx = -999, cy = -999;
     let bx = cx,   by = cy;
-    let targetR = 0, targetG = 230, targetB = 118;
-    let curR = 0,   curG = 230,   curB = 118;
+    let targetR = 255, targetG = 255, targetB = 255;
+    let curR = 255,   curG = 255,   curB = 255;
     let visible = false;
 
     function lerp (a, b, t) { return a + (b - a) * t; }
