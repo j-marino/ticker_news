@@ -4,5 +4,5 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
-RUN almbic upgrade head
+RUN alembic upgrade head
 CMD ["./start.sh"]
