@@ -27,70 +27,52 @@
             <button class="sort-btn" onclick="sortCards('ticker')" id="sort-ticker">ticker A-Z</button>
         </div>
     {% if tickers %}
-    <div class="grid">
-        {% for ticker, data in tickers.items() %}
-        {% set vd = data.verdict_data %}
-        <div class="card {{ vd.verdict }}"
-             onclick="openModal('{{ ticker }}')"
-             data-ticker="{{ ticker }}">
 
-            <div class="card-header">
-                <div class="ticker-info">
-                    {% if data.logo_url %}
-                        <img src="{{ data.logo_url }}" class="company-logo" alt="{{ ticker }}">
-                    {% endif %}
-                    <div>
-                        <div class="ticker-name">{{ ticker }}</div>
-                        {% if data.company_name %}
-                            <div class="company-name">{{ data.company_name }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-                <span class="verdict verdict-{{ vd.verdict }}">{{ vd.verdict | upper }}</span>
-            </div>
+{% set interesting = [] %}
+{% set normal = [] %}
 
-            {% if data.industry %}
-                <div class="industry-tag">{{ data.industry }}</div>
-            {% endif %}
-
-            <div class="signal-row">
-                <span class="signal">analyst {{ vd.analyst_signal }}</span>
-                <span class="signal">insider {{ vd.insider_signal }}</span>
-                {% if vd.earnings_this_week %}
-                    <span class="signal" style="color: var(--yellow); border-color: rgba(255,214,0,0.3);">⚡ earnings</span>
-                {% endif %}
-            </div>
-
-            {% if vd.confidence %}
-            <div class="confidence-row">
-                <span class="confidence-label"><b>confidence: {{ (vd.confidence * 100) | int }}%</b></span></span>
-                <div class="confidence-bar-wrap">
-                    <div class="confidence-bar {{ vd.verdict }}" style="width: {{ ((vd.confidence * 100) | int) }}%;"></div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if vd.key_factors %}
-            <ul class="factors">
-                {% for factor in vd.key_factors %}
-                    <li>{{ factor }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-
-            <div class="card-footer">
-                <span>updated {{ data.updated_at[:10] if data.updated_at else '—' }}</span>
-                <span style="color: var(--green)">click for details →</span>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
+{% for ticker, data in tickers.items() %}
+    {% if data.interesting_ticker %}
+        {% set _ = interesting.append((ticker, data)) %}
     {% else %}
-    <div class="no-data">
-        <h3>// no data yet</h3>
-        <p>The cron job hasn't run yet. Check back soon.</p>
+        {% set _ = normal.append((ticker, data)) %}
+    {% endif %}
+{% endfor %}
+
+    <!-- WATCHLIST — populated by JS after fetching from DB -->
+    <div class="section-block" id="watchlistSection" style="display:none;">
+        <div class="section-title">watchlist</div>
+        <div class="watchlist-strip" id="watchlistStrip"></div>
     </div>
+
+    <!-- TOP PICKS -->
+    {% if interesting %}
+    <div class="section-block">
+        <div class="section-title">top picks</div>
+
+        <div class="grid">
+            {% for ticker, data in interesting %}
+                {% set vd = data.verdict_data %}
+                {% include "partials/ticker_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TODAY'S STOCKS -->
+    {% if normal %}
+    <div class="section-block">
+        <div class="section-title">today's stocks</div>
+
+        <div class="grid">
+            {% for ticker, data in normal %}
+                {% set vd = data.verdict_data %}
+                {% include "partials/ticker_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% endif %}
 
     <p class="disclaimer">⚠ not financial advice — do your own research before trading</p>
@@ -237,30 +219,248 @@ function sortCards(by) {
     document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(`sort-${by}`).classList.add('active');
 
-    const grid = document.querySelector('.grid');
-    const cards = Array.from(grid.querySelectorAll('.card'));
-
     const verdictOrder = { buy: 0, short: 1, sell: 2, hold: 3 };
 
-    cards.sort((a, b) => {
-        const ta = a.dataset.ticker;
-        const tb = b.dataset.ticker;
-        const da = tickerData[ta]?.verdict_data || {};
-        const db = tickerData[tb]?.verdict_data || {};
+    // sort every grid independently (top picks + today's stocks)
+    document.querySelectorAll('.grid').forEach(grid => {
+        const cards = Array.from(grid.querySelectorAll('.card'));
 
-        if (by === 'confidence') {
-            return (db.confidence || 0) - (da.confidence || 0); // highest first
-        }
-        if (by === 'verdict') {
-            return (verdictOrder[da.verdict] ?? 9) - (verdictOrder[db.verdict] ?? 9);
-        }
-        if (by === 'ticker') {
-            return ta.localeCompare(tb);
-        }
+        cards.sort((a, b) => {
+            const ta = a.dataset.ticker;
+            const tb = b.dataset.ticker;
+            const da = tickerData[ta]?.verdict_data || {};
+            const db = tickerData[tb]?.verdict_data || {};
+
+            if (by === 'confidence') {
+                return (db.confidence || 0) - (da.confidence || 0);
+            }
+            if (by === 'verdict') {
+                return (verdictOrder[da.verdict] ?? 9) - (verdictOrder[db.verdict] ?? 9);
+            }
+            if (by === 'ticker') {
+                return ta.localeCompare(tb);
+            }
+        });
+
+        cards.forEach(card => grid.appendChild(card));
     });
-
-    cards.forEach(card => grid.appendChild(card));
 }
+
+function renderWatchlistStrip() {
+    const section = document.getElementById('watchlistSection');
+    const strip = document.getElementById('watchlistStrip');
+
+    if (watchlist.size === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    strip.innerHTML = [...watchlist].map(ticker => {
+        const d = tickerData[ticker];
+        if (!d) return '';
+        const vd = d.verdict_data || {};
+        const verdict = vd.verdict || '';
+        return `
+            <div class="watchlist-mini-card" onclick="openModal('${ticker}')">
+                ${d.logo_url ? `<img src="${d.logo_url}" class="mini-logo">` : ''}
+                <div class="mini-info">
+                    <div class="mini-ticker-row">
+                        <span class="mini-ticker">${ticker}</span>
+                        ${verdict ? `<span class="verdict verdict-${verdict} mini-verdict">${verdict.toUpperCase()}</span>` : ''}
+                    </div>
+                    <div class="mini-company">${d.company_name || ''}</div>
+                    <div class="mini-industry">${d.industry || ''}</div>
+                </div>
+                <button class="mini-remove-btn" onclick="removeFromWatchlist(event, '${ticker}')" title="Remove">×</button>
+            </div>
+        `;
+    }).join('');
+
+    section.style.display = 'block';
+}
+
+// local cache
+const watchlist = new Set();
+
+async function loadWatchlist() {
+    try {
+        const response = await fetch('/watchlist');
+
+        if (!response.ok) {
+            throw new Error('failed to load watchlist');
+        }
+
+        const data = await response.json();
+
+        // clear existing
+        watchlist.clear();
+
+        // add DB values and sync tickerData cache
+        data.watchlist.forEach(item => {
+            watchlist.add(item.ticker);
+            if (tickerData[item.ticker]) {
+                tickerData[item.ticker].is_watchlisted = true;
+            }
+        });
+
+        // clear is_watchlisted for tickers no longer on watchlist
+        Object.keys(tickerData).forEach(ticker => {
+            if (!watchlist.has(ticker) && tickerData[ticker]) {
+                tickerData[ticker].is_watchlisted = false;
+            }
+        });
+
+        // cache locally too
+        localStorage.setItem(
+            'stackz-watchlist',
+            JSON.stringify([...watchlist])
+        );
+
+        // update UI — buttons on cards
+        document.querySelectorAll('.card').forEach(card => {
+            const ticker = card.dataset.ticker;
+            const btn = card.querySelector('.watchlist-btn');
+            if (!btn) return;
+
+            if (watchlist.has(ticker)) {
+                btn.classList.add('active');
+                btn.innerHTML = '★ watching';
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = '☆ watchlist';
+            }
+        });
+
+        // render watchlist strip
+        renderWatchlistStrip();
+
+    } catch (err) {
+        console.error('watchlist load failed:', err);
+
+        // fallback to localStorage
+        const saved = JSON.parse(
+            localStorage.getItem('stackz-watchlist') || '[]'
+        );
+
+        saved.forEach(ticker => {
+            watchlist.add(ticker);
+            if (tickerData[ticker]) {
+                tickerData[ticker].is_watchlisted = true;
+            }
+        });
+
+        document.querySelectorAll('.card').forEach(card => {
+            const ticker = card.dataset.ticker;
+            const btn = card.querySelector('.watchlist-btn');
+            if (!btn) return;
+
+            if (watchlist.has(ticker)) {
+                btn.classList.add('active');
+                btn.innerHTML = '★ watching';
+            }
+        });
+    }
+}
+
+// load from backend on startup
+window.addEventListener('DOMContentLoaded', () => {
+    loadWatchlist();
+});
+
+async function removeFromWatchlist(event, ticker) {
+    event.stopPropagation();
+
+    watchlist.delete(ticker);
+    localStorage.setItem('stackz-watchlist', JSON.stringify([...watchlist]));
+
+    // update the card button if visible
+    const card = document.querySelector(`.card[data-ticker="${ticker}"]`);
+    if (card) {
+        const btn = card.querySelector('.watchlist-btn');
+        if (btn) { btn.classList.remove('active'); btn.innerHTML = '☆ watchlist'; }
+    }
+
+    renderWatchlistStrip();
+
+    try {
+        await fetch('/watchlist', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker })
+        });
+    } catch (err) {
+        console.error('remove watchlist failed:', err);
+        // revert
+        watchlist.add(ticker);
+        localStorage.setItem('stackz-watchlist', JSON.stringify([...watchlist]));
+        renderWatchlistStrip();
+    }
+}
+
+async function toggleWatchlist(event, ticker, button) {
+    // stop card modal opening
+    event.stopPropagation();
+
+    const adding = !watchlist.has(ticker);
+
+    if (adding) {
+        watchlist.add(ticker);
+        button.classList.add('active');
+        button.innerHTML = '★ watching';
+    } else {
+        watchlist.delete(ticker);
+        button.classList.remove('active');
+        button.innerHTML = '☆ watchlist';
+    }
+
+    localStorage.setItem(
+        'stackz-watchlist',
+        JSON.stringify([...watchlist])
+    );
+
+    // send update to backend
+    try {
+        const response = await fetch('/watchlist', {
+            method: adding ? 'POST' : 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ticker: ticker
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('watchlist request failed');
+        }
+
+        const data = await response.json();
+        console.log('watchlist updated:', data);
+        renderWatchlistStrip();
+
+    } catch (err) {
+        console.error(err);
+
+        // revert UI if backend fails
+        if (adding) {
+            watchlist.delete(ticker);
+            button.classList.remove('active');
+            button.innerHTML = '☆ watchlist';
+        } else {
+            watchlist.add(ticker);
+            button.classList.add('active');
+            button.innerHTML = '★ watching';
+        }
+
+        localStorage.setItem(
+            'stackz-watchlist',
+            JSON.stringify([...watchlist])
+        );
+    }
+}
+
+
+
 </script>
 <script src="/static/background.js"></script>
 </body>

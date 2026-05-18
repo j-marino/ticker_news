@@ -41,15 +41,10 @@ body.retro .company-name {
 
 body.retro .industry-tag {
     font-size: 11px;
-
     color: #202020;
-
-    padding: 14px 16px 6px;
-
+    padding: 0 16px 6px;
     margin: 0;
-
     font-weight: bold;
-
     letter-spacing: 0.5px;
 }
 
@@ -77,12 +72,15 @@ body.retro .theme-toggle {
     width: auto;
     margin-top: 0;
     margin-bottom: 12px;
-    box-shadow: none;
+    box-shadow: none !important;
     text-transform: none;
     letter-spacing: 0;
     transition: all 0.1s;
     z-index: auto;
     display: inline-block;
+
+    /* kill futuristic gradient & glow */
+    background-image: none !important;
 }
 
 body.retro .theme-toggle::before {
@@ -91,8 +89,13 @@ body.retro .theme-toggle::before {
 
 body.retro .theme-toggle:hover {
     background: #d6d6d6;
-    box-shadow: none;
-    transform: none;
+    box-shadow: none !important;
+    transform: none !important;
+    border-color: unset;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
 }
 
 body.retro .theme-toggle:active {
@@ -100,8 +103,8 @@ body.retro .theme-toggle:active {
     border-left: 2px solid #404040;
     border-right: 2px solid #ffffff;
     border-bottom: 2px solid #ffffff;
-    box-shadow: none;
-    transform: none;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 body.retro .card:active {
@@ -257,7 +260,7 @@ body.retro .card {
 
     padding: 0;
 
-    overflow: hidden;
+    overflow: visible;
 
     min-height: auto;
 
@@ -266,6 +269,12 @@ body.retro .card {
     transition: none;
 
     image-rendering: pixelated;
+}
+
+body.retro .here-tomorrow {
+    color: #808000;
+    border-top-color: #808000;
+    font-weight: bold;
 }
 
 body.retro .card:hover {
@@ -323,7 +332,6 @@ body.retro .card-content,
 body.retro .factors,
 body.retro .signal-row,
 body.retro .confidence-row,
-
 body.retro .card-footer {
     margin-top: auto;
 
@@ -823,4 +831,123 @@ body.retro * {
   body.retro .grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* ─────────────────────────────────────────────
+   WATCHLIST BUTTON (RETRO)
+   ───────────────────────────────────────────── */
+
+body.retro .watchlist-btn {
+    position: static !important;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    color: #111;
+    backdrop-filter: none;
+    box-shadow: none !important;
+    border-radius: 0;
+    padding: 3px 8px;
+    font-size: 10px;
+    transform: none !important;
+}
+
+body.retro .watchlist-btn:hover {
+    background: #d6d6d6;
+    transform: none !important;
+    color: #000;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+}
+
+body.retro .watchlist-btn.active {
+    background: #ffd700;
+    color: #000;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: none !important;
+}
+
+/* ─────────────────────────────────────────────
+   WATCHLIST MINI CARD (RETRO)
+   ───────────────────────────────────────────── */
+
+body.retro .watchlist-mini-card {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    border-radius: 0 !important;
+    padding: 5px 27px 5px 6px;
+    gap: 6px;
+}
+
+body.retro .watchlist-mini-card:hover {
+    transform: none;
+    border-color: unset;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    background: #d6d6d6;
+}
+
+body.retro .mini-ticker {
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+    color: black;
+}
+
+body.retro .mini-company,
+body.retro .mini-industry {
+    color: #404040;
+}
+
+body.retro .mini-remove-btn {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    color: black;
+    border-radius: 0;
+    font-size: 10px;
+}
+
+body.retro .mini-remove-btn:hover {
+    background: #aa0000;
+    color: white;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+
+/* ─────────────────────────────────────────────
+   CARD ACTIONS (RETRO) — tight, no dead space
+   ───────────────────────────────────────────── */
+
+body.retro .card-actions {
+    padding: 6px 12px 4px;
+    margin-bottom: 0;
+    border-top: none;
+    background: #c0c0c0;
+}
+
+
+.section-title {
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #202020;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    color: rgb(91, 255, 58);
 }

@@ -1,0 +1,79 @@
+<div class="card {{ vd.verdict }}"
+     onclick="openModal('{{ ticker }}')"
+     data-ticker="{{ ticker }}">
+
+    <div class="card-header">
+        <div class="ticker-info">
+            {% if data.logo_url %}
+                <img src="{{ data.logo_url }}" class="company-logo" alt="{{ ticker }}">
+            {% endif %}
+
+            <div>
+                <div class="ticker-name">{{ ticker }}</div>
+
+                {% if data.company_name %}
+                    <div class="company-name">{{ data.company_name }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <span class="verdict verdict-{{ vd.verdict }}">
+            {{ vd.verdict | upper }}
+        </span>
+    </div>
+
+    <div class="card-actions">
+        <button class="watchlist-btn"
+                onclick="toggleWatchlist(event, '{{ ticker }}', this)">
+            ☆ watchlist
+        </button>
+    </div>
+
+    {% if data.industry %}
+        <div class="industry-tag">{{ data.industry }}</div>
+    {% endif %}
+
+    <div class="signal-row">
+        <span class="signal">analyst {{ vd.analyst_signal }}</span>
+        <span class="signal">insider {{ vd.insider_signal }}</span>
+
+        {% if vd.earnings_this_week %}
+            <span class="signal earnings">
+                ⚡ earnings
+            </span>
+        {% endif %}
+    </div>
+
+    {% if vd.confidence %}
+    <div class="confidence-row">
+        <span class="confidence-label">
+            <b>confidence: {{ (vd.confidence * 100) | int }}%</b>
+        </span>
+
+        <div class="confidence-bar-wrap">
+            <div class="confidence-bar {{ vd.verdict }}"
+                 style="width: {{ ((vd.confidence * 100) | int) }}%;">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if vd.key_factors %}
+    <ul class="factors">
+        {% for factor in vd.key_factors %}
+            <li>{{ factor }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if data.interesting_ticker %}
+        <div class="here-tomorrow">
+            ticker stays tomorrow → fresh verdict incoming
+        </div>
+    {% endif %}
+
+    <div class="card-footer">
+        <span>updated {{ data.updated_at[:10] if data.updated_at else '—' }}</span>
+        <span style="color: var(--green)">click for details →</span>
+    </div>
+</div>

@@ -1,10 +1,11 @@
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from datetime import datetime, timedelta, timezone  
 from typing import Annotated
 from random import randint
 
+from models import Token, TokenData, User, UserInDB, UnverifiedUser, UserPublic, WatchList, Verdict
 import os
 import jwt
 import string
@@ -20,7 +21,7 @@ from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from contextlib import asynccontextmanager
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
 from dotenv import load_dotenv
 from database import get_all_verdicts
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -34,37 +35,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
-class User(SQLModel):
-    id: int | None = Field(default=None, primary_key=True)
-    username: str = Field(default=None, index=True)
-    email: EmailStr = Field(default=None, index=True)
-    disabled: bool | None
-
-
-class UserInDB(User, table=True):
-    hashed_password: str
-
-
-class UnverifiedUser(User, table=True):
-    hashed_password: str
-    creation_time: datetime
-    generated_code: int
-
-
-class UserPublic(BaseModel):
-    username: str
-    email: EmailStr
-
-
+# engine = create_engine("postgresql+psycopg://postgres:postgres@localhost/db") DOCS EXAMPLE
 DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 
@@ -121,7 +93,7 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
 
     # prevent startup block
-    asyncio.create_task(populate_background())
+    # asyncio.create_task(populate_background())
 
     # depopulate first 
     # weekdays 6:45am UTC
@@ -221,7 +193,7 @@ def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
 
 
-# prevent client side circumventing the password limits
+# prevent client side circumventing the password & username limits
 def validate_password(password: str) -> bool:
     return (
         len(password) >= 8 and
@@ -471,9 +443,157 @@ async def email_verify(
     response.delete_cookie("pending_username")
     return response
 
-@app.get("/users/me")
-async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-) -> User:
-    return current_user
+
+@app.post("/watchlist")
+async def add_watchlist(data: dict, session: SessionDep, request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
     
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if not username:
+            return RedirectResponse(url="/login")
+        
+        user_id = session.exec(select(UserInDB.id).where(UserInDB.username == username)).first()
+        if not user_id:
+            return RedirectResponse(url="/")
+
+    except InvalidTokenError:
+        return RedirectResponse(url="/login")
+    
+    ticker = data["ticker"]
+
+    existing_watchlist = session.exec(
+    select(WatchList).where(
+        WatchList.user_id == user_id,
+        WatchList.ticker == ticker
+        )
+    ).first()
+
+    if existing_watchlist:
+        return {
+            "success": True,
+            "action": "already_exists",
+            "ticker": ticker
+        }
+
+    existing = session.exec(select(Verdict).where(Verdict.ticker == ticker)).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="ticker not found")
+    
+    else:
+        watchlist_item = WatchList(
+            user_id=user_id,
+            ticker=ticker,
+            company_name=existing.company_name,
+            industry=existing.industry,
+            description=existing.description,
+            logo_url=existing.logo_url
+        )
+        session.add(watchlist_item)
+        session.commit()
+
+    return {"success": True, "action": "added", "ticker": ticker}
+
+
+@app.delete("/watchlist")
+async def remove_watchlist(
+    data: dict,
+    session: SessionDep,
+    request: Request,
+):
+    token = request.cookies.get("access_token")
+
+    if not token:
+        return RedirectResponse(url="/login")
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        username = payload.get("sub")
+
+        if not username:
+            return RedirectResponse(url="/login")
+
+        user_id = session.exec(
+            select(UserInDB.id).where(UserInDB.username == username)
+        ).first()
+
+        if not user_id:
+            return RedirectResponse(url="/")
+
+    except InvalidTokenError:
+        return RedirectResponse(url="/login")
+
+    ticker = data["ticker"]
+
+    watchlist_item = session.exec(
+        select(WatchList).where(
+            WatchList.user_id == user_id,
+            WatchList.ticker == ticker
+        )
+    ).first()
+
+    if not watchlist_item:
+        raise HTTPException(
+            status_code=404,
+            detail="Ticker not in watchlist"
+        )
+
+    session.delete(watchlist_item)
+    session.commit()
+
+    return {
+        "success": True,
+        "action": "removed",
+        "ticker": ticker
+    }
+
+
+@app.get("/watchlist")
+async def get_watchlist(
+    session: SessionDep,
+    request: Request,
+):
+    token = request.cookies.get("access_token")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        username = payload.get("sub")
+
+        if not username:
+            raise HTTPException(status_code=401)
+
+        user_id = session.exec(
+            select(UserInDB.id).where(UserInDB.username == username)
+        ).first()
+
+        if not user_id:
+            raise HTTPException(status_code=404)
+
+    except InvalidTokenError:
+        raise HTTPException(status_code=401)
+
+    watchlist = session.exec(
+        select(WatchList).where(
+            WatchList.user_id == user_id
+        )   
+    ).all()
+
+    return {
+    "watchlist": [
+        {
+            "ticker": item.ticker,
+            "company_name": item.company_name,
+            "industry": item.industry,
+            "logo_url": item.logo_url
+        }
+        for item in watchlist
+    ]
+}

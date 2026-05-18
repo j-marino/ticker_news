@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from datetime import date, timedelta
 from technical_indicators import get_technicals, get_support_resistance
 from vantage_intel import extract_av_tickers
-import yfinance as yf
 import requests
 
 load_dotenv()
@@ -123,10 +122,12 @@ def get_quality_earnings_tickers(finnhub_client):
 
 
 def get_final_watchlist(finnhub_client, parsed):
+    from database import get_interesting_ticker
     news_tickers = [t[0] for t in extract_trending_tickers(parsed)]
     earnings_tickers = get_quality_earnings_tickers(finnhub_client)
     av_tickers = [t["ticker"] for t in extract_av_tickers()]
     merged = list(set(news_tickers + earnings_tickers + av_tickers))
+    interesting_tickers = get_interesting_ticker() # list of tickers [AAPL, NVDA, etc.]
 
     filtered = [
         t for t in merged
@@ -134,7 +135,10 @@ def get_final_watchlist(finnhub_client, parsed):
         and '.' not in t              # foreign listings like BRK.B
         and t.isalpha()               # letters only, no numbers like SABRP
     ]
-    return filtered[:15]
+
+    final = filtered[:15] + interesting_tickers
+
+    return final
 
 
 def get_recommendation_data(finnhub_client, parsed):
@@ -203,13 +207,14 @@ def generate_verdict(ticker, ticker_data):
     prompt = f'''
     Analyse {ticker} using the provided data. Be concise and high-signal.
     Focus on confluence between analyst sentiment, insider activity, technicals, risk/reward, and earnings risk.
+    Quote techninals in the format of: technical: technical data in your summary
 
     Guidelines:
     - Lower forward PE than trailing PE suggests expected earnings growth (bullish)
     - PE >40 requires strong growth to justify. PE 15-30 healthy. PE <15 may indicate undervaluation
     - Negative PE is bearish unless strong turnaround evidence
     - Heavy insider selling is bearish. Weak price action overrides bullish news
-    - Oversold does not automatically mean bullish. Low risk/reward (<1.5:1) lowers confidence
+    - Oversold does not automatically mean bullish. Low risk/reward (<1.5:1) lowers confidence only slightly
     - If signals conflict heavily, choose HOLD
 
     Latest analyst recommendations: {json.dumps(trends[:1])}
@@ -233,6 +238,11 @@ def generate_verdict(ticker, ticker_data):
     Nearest resistance: {sr['nearest_resistance']} ({sr['distance_to_resistance_pct']}% above)
     Risk/reward: {round(sr['distance_to_resistance_pct'] / sr['distance_to_support_pct'], 1) if sr['nearest_support'] and sr['nearest_resistance'] else 'N/A'}:1
 
+    If your confidence is >= 0.7 AND the verdict is BUY OR SELL:
+    interesting=True
+
+    If confidence is >= 0.8 regardless of verdict:
+    interesting=True
     Return this exact JSON:
     {{
         "ticker": "{ticker}",
@@ -240,8 +250,9 @@ def generate_verdict(ticker, ticker_data):
         "confidence": 0.0-1.0,
         "analyst_signal": "bullish/neutral/bearish",
         "insider_signal": "bullish/neutral/bearish",
-        "summary": "2-3 sentence plain english summary",
-        "key_factors": ["factor1", "factor2", "factor3"]
+        "summary": "3-4 sentence plain english summary",
+        "key_factors": ["factor1", "factor2", "factor3"],
+        "interesting_ticker": True/False,
     }}
     '''
 
@@ -257,10 +268,22 @@ def generate_verdict(ticker, ticker_data):
 
 def generate_all_verdicts(ticker_data):
     verdicts = {}
+    interesting_tickers = []
     for ticker, data in ticker_data.items():
         try:
-            verdicts[ticker] = generate_verdict(ticker, data)
-            time.sleep(2)
+            verdict_data = generate_verdict(ticker, data)
+            if verdict_data["interesting_ticker"]:
+                if len(interesting_tickers) < 5: # TEMPORARY HARD CAP OF INTERESTING TICKERS IN THE DB
+                    interesting_tickers.append(ticker)
+                
+                else:
+                    verdict_data["interesting_ticker"] = False
+
+
+            verdicts[ticker] = verdict_data
+
+            
+            time.sleep(2) # prevent GEMINI API from time-based erroring
         except Exception as e:
             print(f"Failed for {ticker}: {e}")
     return verdicts
