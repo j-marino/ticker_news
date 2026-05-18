@@ -11,8 +11,8 @@ load_dotenv()
 
 
 # DATABASE_URL = os.getenv("DATABASE_URL")
-postgres_url = "postgresql+psycopg://postgres:myPassword@localhost:5432/tickers"
-engine = create_engine(postgres_url)
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
 
 
 def create_db_and_tables():
