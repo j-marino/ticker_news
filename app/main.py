@@ -93,7 +93,7 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
 
     # prevent startup block
-    # asyncio.create_task(populate_background())
+    asyncio.create_task(populate_background())
 
     # depopulate first 
     # weekdays 6:45am UTC
