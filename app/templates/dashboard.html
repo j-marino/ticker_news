@@ -256,20 +256,21 @@ function renderWatchlistStrip() {
     }
 
     strip.innerHTML = [...watchlist].map(ticker => {
-        const d = tickerData[ticker];
-        if (!d) return '';
-        const vd = d.verdict_data || {};
+        // use DB metadata as source — available regardless of today's tickers
+        const meta = watchlistMeta[ticker] || tickerData[ticker] || {};
+        const vd = (tickerData[ticker] || {}).verdict_data || {};
         const verdict = vd.verdict || '';
+        const logoUrl = meta.logo_url || (tickerData[ticker] || {}).logo_url || '';
         return `
             <div class="watchlist-mini-card" onclick="openModal('${ticker}')">
-                ${d.logo_url ? `<img src="${d.logo_url}" class="mini-logo">` : ''}
+                ${logoUrl ? `<img src="${logoUrl}" class="mini-logo">` : ''}
                 <div class="mini-info">
                     <div class="mini-ticker-row">
                         <span class="mini-ticker">${ticker}</span>
                         ${verdict ? `<span class="verdict verdict-${verdict} mini-verdict">${verdict.toUpperCase()}</span>` : ''}
                     </div>
-                    <div class="mini-company">${d.company_name || ''}</div>
-                    <div class="mini-industry">${d.industry || ''}</div>
+                    <div class="mini-company">${meta.company_name || ''}</div>
+                    <div class="mini-industry">${meta.industry || ''}</div>
                 </div>
                 <button class="mini-remove-btn" onclick="removeFromWatchlist(event, '${ticker}')" title="Remove">×</button>
             </div>
@@ -281,6 +282,7 @@ function renderWatchlistStrip() {
 
 // local cache
 const watchlist = new Set();
+const watchlistMeta = {}; // ticker -> {company_name, industry, logo_url} from DB
 
 async function loadWatchlist() {
     try {
@@ -298,6 +300,12 @@ async function loadWatchlist() {
         // add DB values and sync tickerData cache
         data.watchlist.forEach(item => {
             watchlist.add(item.ticker);
+            // store metadata from DB — available even if ticker not in today's tickerData
+            watchlistMeta[item.ticker] = {
+                company_name: item.company_name || '',
+                industry: item.industry || '',
+                logo_url: item.logo_url || ''
+            };
             if (tickerData[item.ticker]) {
                 tickerData[item.ticker].is_watchlisted = true;
             }
@@ -405,10 +413,19 @@ async function toggleWatchlist(event, ticker, button) {
 
     if (adding) {
         watchlist.add(ticker);
+        // cache metadata for rendering even on days ticker isn't in today's list
+        if (tickerData[ticker]) {
+            watchlistMeta[ticker] = {
+                company_name: tickerData[ticker].company_name || '',
+                industry: tickerData[ticker].industry || '',
+                logo_url: tickerData[ticker].logo_url || ''
+            };
+        }
         button.classList.add('active');
         button.innerHTML = '★ watching';
     } else {
         watchlist.delete(ticker);
+        delete watchlistMeta[ticker];
         button.classList.remove('active');
         button.innerHTML = '☆ watchlist';
     }

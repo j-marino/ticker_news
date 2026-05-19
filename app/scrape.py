@@ -239,10 +239,10 @@ def generate_verdict(ticker, ticker_data):
     Risk/reward: {round(sr['distance_to_resistance_pct'] / sr['distance_to_support_pct'], 1) if sr['nearest_support'] and sr['nearest_resistance'] else 'N/A'}:1
 
     If your confidence is >= 0.7 AND the verdict is BUY OR SELL:
-    interesting=True
+    interesting_ticker=True
 
     If confidence is >= 0.8 regardless of verdict:
-    interesting=True
+    interesting_ticker=True
     Return this exact JSON:
     {{
         "ticker": "{ticker}",

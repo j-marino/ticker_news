@@ -45,7 +45,7 @@ def store_verdicts(verdicts: dict, profiles: dict):
                 existing.description = profile.get("description") 
                 existing.logo_url = profile.get("logo")
                 existing.updated_at = datetime.now(timezone.utc)
-                existing.interesting_ticker = verdict_data['interesting'] # may change to False on update
+                existing.interesting_ticker = verdict_data["interesting_ticker"] # may change to False on update
                 existing.days_alive = existing.days_alive + 1
                 existing.current_price = price_data["c"]
                 session.add(existing)
@@ -57,7 +57,7 @@ def store_verdicts(verdicts: dict, profiles: dict):
                     industry=profile.get("finnhubIndustry"),
                     description=profile.get("description"),
                     logo_url=profile.get("logo"),
-                    interesting_ticker=verdict_data['interesting'], # decides to keep it or not
+                    interesting_ticker=verdict_data["interesting_ticker"], # decides to keep it or not
                     price_at_generation = price_data["c"] # current price from finnhub e.g. 261.74 (type=float)
                 )
                 session.add(row)
@@ -90,7 +90,7 @@ def delete_uninteresting_tickers():
     with Session(engine) as session:
         session.exec(delete(Verdict).where(Verdict.interesting_ticker == False))
         session.commit()
-        print("deleted tickers with interesting set to False")
+        print("deleted tickers with interesting_ticker set to False")
 
 def get_interesting_ticker():
     with Session(engine) as session:
