@@ -3,14 +3,10 @@ uvicorn
 sqlmodel
 psycopg2-binary
 alembic
-pwdlib[argon2]
-pyjwt
-python-multipart
 dotenv
 finnhub-python
 jinja2
 yfinance
-resend
 slowapi
 apscheduler
 google-genai

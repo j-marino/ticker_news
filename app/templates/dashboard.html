@@ -12,14 +12,12 @@
 <header>
     <div class="logo">$tackz <span>📈</span></div>
     <div class="header-right">
-        <span class="username">{{ username }}</span>
         <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">◈ retro</button>
-        <a href="/logout" class="logout-btn">logout</a>
     </div>
 </header>
 
 <main>
-    <div class="page-title">Today's watchlist — {{ tickers|length }} tickers</div>
+    <div class="page-title">Today's tickers — {{ tickers|length }} tickers</div>
         <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
             <span style="font-family:var(--mono); font-size:10px; color:var(--text-muted); letter-spacing:1px;">SORT BY</span>
             <button class="sort-btn active" onclick="sortCards('confidence')" id="sort-confidence">confidence</button>
@@ -39,7 +37,7 @@
     {% endif %}
 {% endfor %}
 
-    <!-- WATCHLIST — populated by JS after fetching from DB -->
+    <!-- WATCHLIST — saved in this browser -->
     <div class="section-block" id="watchlistSection" style="display:none;">
         <div class="section-title">watchlist</div>
         <div class="watchlist-strip" id="watchlistStrip"></div>
@@ -282,138 +280,46 @@ function renderWatchlistStrip() {
 
 // local cache
 const watchlist = new Set();
-const watchlistMeta = {}; // ticker -> {company_name, industry, logo_url} from DB
+const watchlistMeta = {};
 
-async function loadWatchlist() {
-    try {
-        const response = await fetch('/watchlist');
-
-        if (!response.ok) {
-            throw new Error('failed to load watchlist');
-        }
-
-        const data = await response.json();
-
-        // clear existing
-        watchlist.clear();
-
-        // add DB values and sync tickerData cache
-        data.watchlist.forEach(item => {
-            watchlist.add(item.ticker);
-            // store metadata from DB — available even if ticker not in today's tickerData
-            watchlistMeta[item.ticker] = {
-                company_name: item.company_name || '',
-                industry: item.industry || '',
-                logo_url: item.logo_url || ''
-            };
-            if (tickerData[item.ticker]) {
-                tickerData[item.ticker].is_watchlisted = true;
-            }
-        });
-
-        // clear is_watchlisted for tickers no longer on watchlist
-        Object.keys(tickerData).forEach(ticker => {
-            if (!watchlist.has(ticker) && tickerData[ticker]) {
-                tickerData[ticker].is_watchlisted = false;
-            }
-        });
-
-        // cache locally too
-        localStorage.setItem(
-            'stackz-watchlist',
-            JSON.stringify([...watchlist])
-        );
-
-        // update UI — buttons on cards
-        document.querySelectorAll('.card').forEach(card => {
-            const ticker = card.dataset.ticker;
-            const btn = card.querySelector('.watchlist-btn');
-            if (!btn) return;
-
-            if (watchlist.has(ticker)) {
-                btn.classList.add('active');
-                btn.innerHTML = '★ watching';
-            } else {
-                btn.classList.remove('active');
-                btn.innerHTML = '☆ watchlist';
-            }
-        });
-
-        // render watchlist strip
-        renderWatchlistStrip();
-
-    } catch (err) {
-        console.error('watchlist load failed:', err);
-
-        // fallback to localStorage
-        const saved = JSON.parse(
-            localStorage.getItem('stackz-watchlist') || '[]'
-        );
-
-        saved.forEach(ticker => {
-            watchlist.add(ticker);
-            if (tickerData[ticker]) {
-                tickerData[ticker].is_watchlisted = true;
-            }
-        });
-
-        document.querySelectorAll('.card').forEach(card => {
-            const ticker = card.dataset.ticker;
-            const btn = card.querySelector('.watchlist-btn');
-            if (!btn) return;
-
-            if (watchlist.has(ticker)) {
-                btn.classList.add('active');
-                btn.innerHTML = '★ watching';
-            }
-        });
-    }
+function saveWatchlist() {
+    localStorage.setItem('stackz-watchlist', JSON.stringify([...watchlist]));
 }
 
-// load from backend on startup
-window.addEventListener('DOMContentLoaded', () => {
-    loadWatchlist();
-});
+function loadWatchlist() {
+    const saved = JSON.parse(localStorage.getItem('stackz-watchlist') || '[]');
+    saved.forEach(ticker => watchlist.add(ticker));
+    document.querySelectorAll('.card').forEach(card => {
+        const button = card.querySelector('.watchlist-btn');
+        if (!button) return;
+        const watching = watchlist.has(card.dataset.ticker);
+        button.classList.toggle('active', watching);
+        button.innerHTML = watching ? '★ watching' : '☆ watchlist';
+    });
+    renderWatchlistStrip();
+}
 
-async function removeFromWatchlist(event, ticker) {
+window.addEventListener('DOMContentLoaded', loadWatchlist);
+
+function removeFromWatchlist(event, ticker) {
     event.stopPropagation();
-
     watchlist.delete(ticker);
-    localStorage.setItem('stackz-watchlist', JSON.stringify([...watchlist]));
-
-    // update the card button if visible
+    saveWatchlist();
     const card = document.querySelector(`.card[data-ticker="${ticker}"]`);
     if (card) {
         const btn = card.querySelector('.watchlist-btn');
         if (btn) { btn.classList.remove('active'); btn.innerHTML = '☆ watchlist'; }
     }
-
     renderWatchlistStrip();
-
-    try {
-        await fetch('/watchlist', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ticker })
-        });
-    } catch (err) {
-        console.error('remove watchlist failed:', err);
-        // revert
-        watchlist.add(ticker);
-        localStorage.setItem('stackz-watchlist', JSON.stringify([...watchlist]));
-        renderWatchlistStrip();
-    }
 }
 
-async function toggleWatchlist(event, ticker, button) {
-    // stop card modal opening
+function toggleWatchlist(event, ticker, button) {
     event.stopPropagation();
 
     const adding = !watchlist.has(ticker);
 
     if (adding) {
         watchlist.add(ticker);
-        // cache metadata for rendering even on days ticker isn't in today's list
         if (tickerData[ticker]) {
             watchlistMeta[ticker] = {
                 company_name: tickerData[ticker].company_name || '',
@@ -430,50 +336,8 @@ async function toggleWatchlist(event, ticker, button) {
         button.innerHTML = '☆ watchlist';
     }
 
-    localStorage.setItem(
-        'stackz-watchlist',
-        JSON.stringify([...watchlist])
-    );
-
-    // send update to backend
-    try {
-        const response = await fetch('/watchlist', {
-            method: adding ? 'POST' : 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ticker: ticker
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('watchlist request failed');
-        }
-
-        const data = await response.json();
-        console.log('watchlist updated:', data);
-        renderWatchlistStrip();
-
-    } catch (err) {
-        console.error(err);
-
-        // revert UI if backend fails
-        if (adding) {
-            watchlist.delete(ticker);
-            button.classList.remove('active');
-            button.innerHTML = '☆ watchlist';
-        } else {
-            watchlist.add(ticker);
-            button.classList.add('active');
-            button.innerHTML = '★ watching';
-        }
-
-        localStorage.setItem(
-            'stackz-watchlist',
-            JSON.stringify([...watchlist])
-        );
-    }
+    saveWatchlist();
+    renderWatchlistStrip();
 }
 
 
