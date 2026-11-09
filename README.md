@@ -1,6 +1,6 @@
-# $tackz
+# ticker_news
 
-$tackz is a public stock-news dashboard that combines market news, analyst and insider data, and technical indicators to generate AI-written ticker verdicts. The verdicts are informational, not financial advice.
+ticker_news is a public stock-news dashboard that combines market news, analyst and insider data, and technical indicators to generate AI-written ticker verdicts. The verdicts are informational, not financial advice.
 
 There is no login or email registration. Visiting the deployed site opens the ticker dashboard directly at `/`. Watchlists are saved in the current browser using local storage and are not shared across browsers or devices.
 
